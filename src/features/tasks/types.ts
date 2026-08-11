@@ -3,12 +3,14 @@ import type { z } from "zod";
 import type {
   createTaskSchema,
   taskPrioritySchema,
+  taskSortSchema,
   taskStatusSchema,
   updateTaskSchema,
 } from "@/features/tasks/schemas";
 
 export type TaskStatus = z.infer<typeof taskStatusSchema>;
 export type TaskPriority = z.infer<typeof taskPrioritySchema>;
+export type TaskSort = z.infer<typeof taskSortSchema>;
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 

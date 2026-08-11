@@ -24,7 +24,7 @@ function DueDate({ task, today }: { task: Task; today: string }) {
   );
   return (
     <span
-      className={`inline-flex items-center gap-1.5 text-sm ${overdue ? "font-bold text-rose-600 dark:text-rose-300" : "text-muted-foreground"}`}
+      className={`inline-flex items-center gap-1.5 text-sm ${overdue ? "text-danger font-bold" : "text-muted-foreground"}`}
     >
       <CalendarDays className="size-4" aria-hidden="true" />
       {formatDueDate(task.dueDate)}
@@ -50,7 +50,11 @@ function TaskActions({
 }: TaskActionsProps) {
   const completed = task.status === "completed";
   return (
-    <div className="flex items-center justify-end gap-1">
+    <div
+      role="group"
+      aria-label={`Actions for ${task.title}`}
+      className="flex items-center justify-end gap-1"
+    >
       <button
         type="button"
         disabled={togglingId === task.id}
@@ -58,7 +62,7 @@ function TaskActions({
         aria-label={
           completed ? `Reopen ${task.title}` : `Complete ${task.title}`
         }
-        className="hover:bg-muted grid size-9 place-items-center rounded-lg transition disabled:opacity-50"
+        className="hover:bg-muted grid size-11 place-items-center rounded-xl transition disabled:opacity-50"
       >
         {completed ? (
           <RotateCcw className="size-4" aria-hidden="true" />
@@ -70,7 +74,7 @@ function TaskActions({
         type="button"
         onClick={() => onEdit(task)}
         aria-label={`Edit ${task.title}`}
-        className="hover:bg-muted grid size-9 place-items-center rounded-lg transition"
+        className="hover:bg-muted grid size-11 place-items-center rounded-xl transition"
       >
         <Pencil className="size-4" aria-hidden="true" />
       </button>
@@ -78,7 +82,7 @@ function TaskActions({
         type="button"
         onClick={() => onDelete(task)}
         aria-label={`Delete ${task.title}`}
-        className="grid size-9 place-items-center rounded-lg text-rose-600 transition hover:bg-rose-500/10 dark:text-rose-300"
+        className="text-danger hover:bg-danger/10 grid size-11 place-items-center rounded-xl transition"
       >
         <Trash2 className="size-4" aria-hidden="true" />
       </button>
@@ -90,10 +94,13 @@ export function TaskList(props: TaskListProps) {
   const { tasks, today, togglingId, onToggle, onEdit, onDelete } = props;
   const actionProps = { togglingId, onToggle, onEdit, onDelete };
   return (
-    <section aria-label="Tasks">
+    <div>
       <div className="border-border bg-card hidden overflow-hidden rounded-2xl border shadow-sm md:block">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] border-collapse text-left">
+            <caption className="sr-only">
+              Tasks with status, priority, due date, and available actions
+            </caption>
             <thead className="bg-muted/70 text-muted-foreground text-xs tracking-wide uppercase">
               <tr>
                 <th scope="col" className="px-5 py-3">
@@ -115,7 +122,10 @@ export function TaskList(props: TaskListProps) {
             </thead>
             <tbody className="divide-border divide-y">
               {tasks.map((task) => (
-                <tr key={task.id} className="hover:bg-muted/35 transition">
+                <tr
+                  key={task.id}
+                  className="hover:bg-muted/35 transition-colors"
+                >
                   <td className="max-w-md px-5 py-4">
                     <p
                       className={`font-bold ${task.status === "completed" ? "text-muted-foreground line-through" : ""}`}
@@ -163,18 +173,20 @@ export function TaskList(props: TaskListProps) {
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h2
+                <h3
                   className={`font-extrabold break-words ${task.status === "completed" ? "text-muted-foreground line-through" : ""}`}
                 >
                   {task.title}
-                </h2>
+                </h3>
                 {task.description ? (
                   <p className="text-muted-foreground mt-1 line-clamp-2 text-sm leading-6">
                     {task.description}
                   </p>
                 ) : null}
               </div>
-              <TaskActions task={task} {...actionProps} />
+              <div className="shrink-0">
+                <TaskActions task={task} {...actionProps} />
+              </div>
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span
@@ -194,6 +206,6 @@ export function TaskList(props: TaskListProps) {
           </article>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

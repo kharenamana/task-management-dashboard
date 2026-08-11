@@ -33,6 +33,8 @@ describe("authentication forms", () => {
     const user = userEvent.setup();
     render(<SignupForm />);
 
+    expect(screen.getByRole("form", { name: "Create account" })).toBeVisible();
+
     await user.type(screen.getByLabelText("Full name"), "Ada Lovelace");
     await user.type(screen.getByLabelText("Email address"), "ada@example.com");
     await user.type(screen.getByLabelText("Password"), "Secure123");
@@ -53,6 +55,10 @@ describe("authentication forms", () => {
     const user = userEvent.setup();
     render(<ForgotPasswordForm />);
 
+    expect(
+      screen.getByRole("form", { name: "Request password reset" }),
+    ).toBeVisible();
+
     await user.type(screen.getByLabelText("Email address"), "ada@example.com");
     await user.click(screen.getByRole("button", { name: "Send reset link" }));
 
@@ -68,6 +74,10 @@ describe("authentication forms", () => {
     });
     const user = userEvent.setup();
     render(<ResetPasswordForm />);
+
+    expect(
+      screen.getByRole("form", { name: "Set new password" }),
+    ).toBeVisible();
 
     await user.type(screen.getByLabelText("New password"), "NewSecure123");
     await user.type(

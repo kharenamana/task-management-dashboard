@@ -1,5 +1,9 @@
 import { taskPriorities, taskStatuses } from "@/features/tasks/schemas";
-import type { TaskPriority, TaskStatus } from "@/features/tasks/types";
+import type {
+  TaskPriority,
+  TaskSort,
+  TaskStatus,
+} from "@/features/tasks/types";
 
 export const taskStatusLabels = {
   pending: "Pending",
@@ -12,6 +16,11 @@ export const taskPriorityLabels = {
   medium: "Medium",
   high: "High",
 } satisfies Record<TaskPriority, string>;
+
+export const taskSortLabels = {
+  due_asc: "Due date: earliest",
+  due_desc: "Due date: latest",
+} satisfies Record<TaskSort, string>;
 
 export const taskStatusStyles = {
   pending: "bg-amber-500/10 text-amber-700 dark:text-amber-300",

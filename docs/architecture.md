@@ -35,6 +35,8 @@ The task feature separates public schemas/contracts, a server-only service, and 
 
 The dashboard Server Component authenticates and hydrates the URL-selected task query. Dashboard-only providers keep TanStack Query, notifications, and diagnostics out of public route bundles; heavy task dialogs load on demand. Client components use TanStack Query for background refresh, metrics, and mutations. Completion and deletion update matching list caches optimistically with rollback; authoritative lists and the single-query metrics RPC are revalidated afterward. Search, filters, sorting, and pagination live in the URL, while only temporary dialog/form state remains local.
 
+Dashboard presentation uses neutral working surfaces with semantic accent, danger, and success tokens. Search is the primary task control; active filters are independently removable and pagination restores focus to the refreshed results heading. Motion is CSS-only, limited to short opacity/transform transitions, and disabled when reduced motion is requested. Radix owns dialog focus trapping/restoration while controlled close handlers protect dirty form input.
+
 ## Repository map
 
 ```text

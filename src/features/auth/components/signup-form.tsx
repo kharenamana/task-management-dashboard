@@ -43,7 +43,12 @@ export function SignupForm() {
   });
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-5">
+    <form
+      aria-label="Create account"
+      onSubmit={onSubmit}
+      noValidate
+      className="space-y-5"
+    >
       <FormStatus message={result?.message} success={result?.success} />
       <div>
         <label htmlFor="fullName" className="text-sm font-bold">
@@ -121,10 +126,7 @@ export function SignupForm() {
       </SubmitButton>
       <p className="text-muted-foreground text-center text-sm">
         Already have an account?{" "}
-        <Link
-          href="/login"
-          className="font-bold text-violet-600 hover:underline dark:text-violet-300"
-        >
+        <Link href="/login" className="text-accent font-bold hover:underline">
           Sign in
         </Link>
       </p>

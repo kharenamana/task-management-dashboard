@@ -45,7 +45,12 @@ export function LoginForm({
   });
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-5">
+    <form
+      aria-label="Sign in"
+      onSubmit={onSubmit}
+      noValidate
+      className="space-y-5"
+    >
       <FormStatus message={serverMessage ?? initialMessage} />
       <input type="hidden" {...register("next")} />
       <div>
@@ -72,7 +77,7 @@ export function LoginForm({
           </label>
           <Link
             href="/forgot-password"
-            className="text-sm font-semibold text-violet-600 hover:underline dark:text-violet-300"
+            className="text-accent text-sm font-semibold hover:underline"
           >
             Forgot password?
           </Link>
@@ -93,10 +98,7 @@ export function LoginForm({
       </SubmitButton>
       <p className="text-muted-foreground text-center text-sm">
         New to TaskFlow?{" "}
-        <Link
-          href="/signup"
-          className="font-bold text-violet-600 hover:underline dark:text-violet-300"
-        >
+        <Link href="/signup" className="text-accent font-bold hover:underline">
           Create an account
         </Link>
       </p>

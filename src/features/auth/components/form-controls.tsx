@@ -12,10 +12,7 @@ export function FieldError({
 }) {
   if (!message) return null;
   return (
-    <p
-      id={id}
-      className="mt-1.5 text-sm font-medium text-rose-600 dark:text-rose-300"
-    >
+    <p id={id} className="text-danger mt-1.5 text-sm font-medium">
       {message}
     </p>
   );
@@ -34,8 +31,8 @@ export function FormStatus({
       role={success ? "status" : "alert"}
       className={`rounded-xl border px-3.5 py-3 text-sm font-semibold ${
         success
-          ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-          : "border-rose-500/25 bg-rose-500/10 text-rose-700 dark:text-rose-300"
+          ? "border-success/25 bg-success/10 text-success"
+          : "border-danger/25 bg-danger/10 text-danger"
       }`}
     >
       {message}

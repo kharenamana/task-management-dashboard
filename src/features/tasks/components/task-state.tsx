@@ -2,14 +2,16 @@ import { CircleAlert, ListChecks, SearchX } from "lucide-react";
 
 export function TaskLoading() {
   return (
-    <div className="space-y-3" aria-label="Loading tasks" role="status">
+    <div aria-label="Loading tasks" role="status">
       <span className="sr-only">Loading tasks…</span>
-      {Array.from({ length: 4 }, (_, index) => (
-        <div
-          key={index}
-          className="border-border bg-card h-20 animate-pulse rounded-2xl border"
-        />
-      ))}
+      <div className="space-y-3" aria-hidden="true">
+        {Array.from({ length: 4 }, (_, index) => (
+          <div
+            key={index}
+            className="border-border bg-card h-20 animate-pulse rounded-2xl border"
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -31,7 +33,7 @@ export function TaskErrorState({ retry }: { retry: () => void }) {
       <button
         type="button"
         onClick={retry}
-        className="mt-5 rounded-xl bg-violet-600 px-4 py-2.5 font-bold text-white"
+        className="mt-5 min-h-11 rounded-xl bg-violet-600 px-4 font-bold text-white"
       >
         Try again
       </button>
@@ -42,9 +44,11 @@ export function TaskErrorState({ retry }: { retry: () => void }) {
 export function TaskEmptyState({
   filtered,
   create,
+  clearFilters,
 }: {
   filtered: boolean;
   create: () => void;
+  clearFilters: () => void;
 }) {
   const Icon = filtered ? SearchX : ListChecks;
   return (
@@ -58,15 +62,23 @@ export function TaskEmptyState({
           ? "Try a different search or clear one of the filters."
           : "Create your first task and turn today’s plan into visible progress."}
       </p>
-      {!filtered ? (
+      {filtered ? (
+        <button
+          type="button"
+          onClick={clearFilters}
+          className="border-border bg-background hover:bg-muted mt-5 min-h-11 rounded-xl border px-5 font-bold transition"
+        >
+          Clear filters
+        </button>
+      ) : (
         <button
           type="button"
           onClick={create}
-          className="mt-5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-2.5 font-bold text-white"
+          className="mt-5 min-h-11 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 font-bold text-white"
         >
           Create first task
         </button>
-      ) : null}
+      )}
     </div>
   );
 }

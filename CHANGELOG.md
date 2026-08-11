@@ -9,11 +9,13 @@
 ### Changed
 
 - Scoped task-query providers and dialogs to the dashboard, narrowed session proxy coverage, reused authenticated Supabase request clients, and consolidated dashboard metrics into one RLS-protected aggregate function
+- Refined dashboard hierarchy with search-first controls, removable filter chips, neutral metrics, larger action targets, focused pagination, and protected dirty forms
 
 ### Added
 
 - Added seven static public case-study routes with unique canonical, Open Graph, and Twitter metadata
 - Added sitemap, robots policy, web manifest, generated icons/social image, crawlable navigation, and content-matched structured data
+- Added named forms, consistent skip targets, semantic table/action labels, reduced-motion behavior, and focused axe Playwright checks
 
 ## 0.1.0 - 2026-08-11
 

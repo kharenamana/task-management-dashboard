@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { MetricCards } from "@/features/tasks/components/metric-cards";
 import { TaskList } from "@/features/tasks/components/task-list";
@@ -46,6 +46,8 @@ export function DashboardClient({
   const [formOpen, setFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [deletingTask, setDeletingTask] = useState<Task | null>(null);
+  const focusPageRef = useRef<number | null>(null);
+  const resultsHeadingRef = useRef<HTMLHeadingElement>(null);
   const today = useLocalToday();
   const tasksQuery = useTasks(query);
   const metricsQuery = useTaskMetrics(today);
@@ -71,11 +73,28 @@ export function DashboardClient({
     updateQuery({ page: lastPage === 1 ? undefined : String(lastPage) }, false);
   }, [meta, query.page, tasksQuery.isSuccess, updateQuery]);
 
+  useEffect(() => {
+    if (
+      focusPageRef.current !== query.page ||
+      isNavigating ||
+      tasksQuery.isFetching ||
+      !tasksQuery.isSuccess
+    ) {
+      return;
+    }
+    resultsHeadingRef.current?.focus();
+    focusPageRef.current = null;
+  }, [isNavigating, query.page, tasksQuery.isFetching, tasksQuery.isSuccess]);
+
   return (
-    <main className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-10">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-10"
+    >
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-bold text-violet-600 dark:text-violet-300">
+          <p className="text-accent text-sm font-bold">
             Your private workspace
           </p>
           <h1 className="mt-1 text-3xl font-black tracking-tight sm:text-4xl">
@@ -85,7 +104,11 @@ export function DashboardClient({
             Plan clearly, focus deliberately, and finish meaningful work.
           </p>
         </div>
-        <p className="text-muted-foreground text-sm" aria-live="polite">
+        <p
+          className="text-muted-foreground text-sm"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           {tasksQuery.isFetching || isNavigating
             ? "Refreshing tasks…"
             : meta
@@ -99,10 +122,7 @@ export function DashboardClient({
         loading={metricsQuery.isPending}
       />
       {metricsQuery.isError ? (
-        <p
-          role="alert"
-          className="mt-3 text-sm font-semibold text-rose-600 dark:text-rose-300"
-        >
+        <p role="alert" className="text-danger mt-3 text-sm font-semibold">
           Summary metrics could not be refreshed.
         </p>
       ) : null}
@@ -112,21 +132,49 @@ export function DashboardClient({
           query={query}
           searchValue={searchValue}
           onSearchChange={setSearchValue}
+          onSearchClear={() => {
+            setSearchValue("");
+            updateQuery({ q: undefined });
+          }}
           onQueryChange={(key, value) =>
             updateQuery({ [key]: value || undefined })
           }
+          onFilterRemove={(key) => updateQuery({ [key]: undefined })}
           onClear={clear}
           onCreate={openCreate}
         />
       </div>
 
-      <div className="mt-5">
+      <section
+        className="mt-6"
+        aria-labelledby="task-results-heading"
+        aria-busy={tasksQuery.isFetching || isNavigating}
+      >
+        <div className="mb-3 flex min-h-8 items-center justify-between gap-4">
+          <h2
+            id="task-results-heading"
+            ref={resultsHeadingRef}
+            tabIndex={-1}
+            className="text-xl font-black tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-4"
+          >
+            Tasks
+          </h2>
+          {tasksQuery.isFetching && !tasksQuery.isPending ? (
+            <span className="text-muted-foreground text-xs font-semibold">
+              Updating…
+            </span>
+          ) : null}
+        </div>
         {tasksQuery.isPending ? <TaskLoading /> : null}
         {tasksQuery.isError ? (
           <TaskErrorState retry={() => void tasksQuery.refetch()} />
         ) : null}
         {tasksQuery.isSuccess && tasks.length === 0 ? (
-          <TaskEmptyState filtered={filtered} create={openCreate} />
+          <TaskEmptyState
+            filtered={filtered}
+            create={openCreate}
+            clearFilters={clear}
+          />
         ) : null}
         {tasks.length > 0 ? (
           <TaskList
@@ -142,12 +190,15 @@ export function DashboardClient({
             onDelete={setDeletingTask}
           />
         ) : null}
-      </div>
+      </section>
 
       {meta ? (
         <TaskPagination
           meta={meta}
-          onPageChange={(page) => updateQuery({ page: String(page) }, false)}
+          onPageChange={(page) => {
+            focusPageRef.current = page;
+            updateQuery({ page: String(page) }, false);
+          }}
         />
       ) : null}
 
@@ -159,10 +210,12 @@ export function DashboardClient({
           task={editingTask}
         />
       ) : null}
-      <DeleteTaskDialog
-        task={deletingTask}
-        onClose={() => setDeletingTask(null)}
-      />
+      {deletingTask ? (
+        <DeleteTaskDialog
+          task={deletingTask}
+          onClose={() => setDeletingTask(null)}
+        />
+      ) : null}
     </main>
   );
 }

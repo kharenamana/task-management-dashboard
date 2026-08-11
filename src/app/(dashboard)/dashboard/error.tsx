@@ -15,7 +15,11 @@ export default function DashboardError({
   }, [error]);
 
   return (
-    <main className="mx-auto max-w-2xl px-5 py-20 text-center">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto max-w-2xl px-5 py-20 text-center"
+    >
       <CircleAlert
         className="mx-auto size-12 text-rose-500"
         aria-hidden="true"

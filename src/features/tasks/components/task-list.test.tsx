@@ -35,6 +35,14 @@ describe("TaskList", () => {
     expect(screen.getAllByText("Ship dashboard")).not.toHaveLength(0);
     expect(screen.getAllByText(/Overdue/u)).not.toHaveLength(0);
     expect(screen.getByRole("columnheader", { name: "Task" })).toBeVisible();
+    expect(
+      screen.getByText(
+        "Tasks with status, priority, due date, and available actions",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("group", { name: "Actions for Ship dashboard" }),
+    ).not.toHaveLength(0);
 
     await user.click(
       screen.getAllByRole("button", { name: "Complete Ship dashboard" })[0]!,

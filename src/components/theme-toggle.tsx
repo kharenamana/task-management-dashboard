@@ -21,7 +21,7 @@ export function ThemeToggle() {
         <button
           type="button"
           aria-label="Choose color theme"
-          className="border-border bg-card hover:bg-muted grid size-10 place-items-center rounded-xl border transition disabled:opacity-60"
+          className="border-border bg-card hover:bg-muted grid size-11 place-items-center rounded-xl border transition disabled:opacity-60"
         >
           <CurrentIcon className="size-4" aria-hidden="true" />
         </button>
@@ -36,7 +36,7 @@ export function ThemeToggle() {
             <DropdownMenu.Item
               key={value}
               onSelect={() => setTheme(value)}
-              className="hover:bg-muted focus:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold outline-none"
+              className="hover:bg-muted focus:bg-muted flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-3 text-sm font-semibold outline-none"
             >
               <Icon className="size-4" aria-hidden="true" />
               <span className="flex-1">{label}</span>

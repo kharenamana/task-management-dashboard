@@ -16,7 +16,10 @@ export default function RootError({
   }, [error]);
 
   return (
-    <main className="grid min-h-screen place-items-center px-5 py-16 text-center">
+    <main
+      id="main-content"
+      className="grid min-h-screen place-items-center px-5 py-16 text-center"
+    >
       <div className="max-w-lg">
         <CircleAlert
           className="mx-auto size-12 text-rose-500"

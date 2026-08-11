@@ -1,10 +1,18 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 const dashboardMocks = vi.hoisted(() => ({
   replace: vi.fn(),
   searchParams: new URLSearchParams(),
   toggle: vi.fn(),
   remove: vi.fn(),
+  meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 },
 }));
 
 vi.mock("next/navigation", () => ({
@@ -17,7 +25,7 @@ vi.mock("@/features/tasks/hooks/use-tasks", () => ({
   useTasks: () => ({
     data: {
       data: [],
-      meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 },
+      meta: dashboardMocks.meta,
     },
     isError: false,
     isFetching: false,
@@ -49,6 +57,12 @@ describe("DashboardClient", () => {
     vi.useFakeTimers();
     dashboardMocks.replace.mockClear();
     dashboardMocks.searchParams = new URLSearchParams();
+    dashboardMocks.meta = {
+      page: 1,
+      pageSize: 20,
+      total: 0,
+      totalPages: 0,
+    };
   });
 
   afterEach(() => vi.useRealTimers());
@@ -66,5 +80,32 @@ describe("DashboardClient", () => {
     expect(dashboardMocks.replace).toHaveBeenCalledWith("/dashboard?q=ship", {
       scroll: false,
     });
+  });
+
+  it("moves focus to task results after pagination settles", async () => {
+    vi.useRealTimers();
+    dashboardMocks.meta = {
+      page: 1,
+      pageSize: 20,
+      total: 25,
+      totalPages: 2,
+    };
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <DashboardClient initialQuery={defaultTaskQuery} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+    expect(dashboardMocks.replace).toHaveBeenCalledWith("/dashboard?page=2", {
+      scroll: false,
+    });
+
+    dashboardMocks.searchParams = new URLSearchParams("page=2");
+    dashboardMocks.meta = { ...dashboardMocks.meta, page: 2 };
+    rerender(<DashboardClient initialQuery={defaultTaskQuery} />);
+
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: "Tasks" })).toHaveFocus(),
+    );
   });
 });

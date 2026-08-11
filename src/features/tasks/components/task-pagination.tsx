@@ -18,7 +18,7 @@ export function TaskPagination({
         type="button"
         disabled={meta.page <= 1}
         onClick={() => onPageChange(meta.page - 1)}
-        className="border-border bg-card hover:bg-muted rounded-xl border px-4 py-2 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-50"
+        className="border-border bg-card hover:bg-muted min-h-11 rounded-xl border px-4 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-50"
       >
         Previous
       </button>
@@ -29,7 +29,7 @@ export function TaskPagination({
         type="button"
         disabled={meta.page >= meta.totalPages}
         onClick={() => onPageChange(meta.page + 1)}
-        className="border-border bg-card hover:bg-muted rounded-xl border px-4 py-2 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-50"
+        className="border-border bg-card hover:bg-muted min-h-11 rounded-xl border px-4 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-50"
       >
         Next
       </button>

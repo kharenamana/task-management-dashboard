@@ -24,20 +24,26 @@ describe("task states", () => {
 
   it("distinguishes a new workspace from an empty search", async () => {
     const create = vi.fn();
+    const clearFilters = vi.fn();
     const user = userEvent.setup();
     const { rerender } = render(
-      <TaskEmptyState filtered={false} create={create} />,
+      <TaskEmptyState
+        filtered={false}
+        create={create}
+        clearFilters={clearFilters}
+      />,
     );
 
     await user.click(screen.getByRole("button", { name: "Create first task" }));
     expect(create).toHaveBeenCalledOnce();
 
-    rerender(<TaskEmptyState filtered create={create} />);
+    rerender(
+      <TaskEmptyState filtered create={create} clearFilters={clearFilters} />,
+    );
     expect(
       screen.getByRole("heading", { name: "No matching tasks" }),
     ).toBeVisible();
-    expect(
-      screen.queryByRole("button", { name: "Create first task" }),
-    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Clear filters" }));
+    expect(clearFilters).toHaveBeenCalledOnce();
   });
 });

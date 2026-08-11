@@ -36,9 +36,12 @@ export function DeleteTaskDialog({
       }}
     >
       <AlertDialog.Portal>
-        <AlertDialog.Overlay className="fixed inset-0 z-40 bg-slate-950/55 backdrop-blur-sm" />
-        <AlertDialog.Content className="border-border bg-card fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-[1.75rem] border p-6 shadow-2xl sm:p-8">
-          <div className="grid size-12 place-items-center rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-300">
+        <AlertDialog.Overlay className="dialog-overlay fixed inset-0 z-40 bg-slate-950/55 backdrop-blur-sm" />
+        <AlertDialog.Content
+          aria-busy={mutation.isPending}
+          className="dialog-content border-border bg-card fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-[1.75rem] border p-6 shadow-2xl sm:p-8"
+        >
+          <div className="bg-danger/10 text-danger grid size-12 place-items-center rounded-2xl">
             <Trash2 className="size-6" aria-hidden="true" />
           </div>
           <AlertDialog.Title className="mt-5 text-xl font-black">
@@ -51,7 +54,7 @@ export function DeleteTaskDialog({
           {mutation.isError ? (
             <p
               role="alert"
-              className="mt-4 rounded-xl bg-rose-500/10 px-3 py-2 text-sm font-semibold text-rose-700 dark:text-rose-300"
+              className="bg-danger/10 text-danger mt-4 rounded-xl px-3 py-2 text-sm font-semibold"
             >
               {mutation.error.message}
             </p>
@@ -61,7 +64,7 @@ export function DeleteTaskDialog({
               <button
                 type="button"
                 disabled={mutation.isPending}
-                className="border-border hover:bg-muted rounded-xl border px-4 py-2.5 font-bold"
+                className="border-border hover:bg-muted min-h-11 rounded-xl border px-4 font-bold"
               >
                 Keep task
               </button>
@@ -71,7 +74,7 @@ export function DeleteTaskDialog({
                 type="button"
                 onClick={confirm}
                 disabled={mutation.isPending}
-                className="rounded-xl bg-rose-600 px-4 py-2.5 font-bold text-white hover:bg-rose-700 disabled:cursor-wait disabled:opacity-65"
+                className="min-h-11 rounded-xl bg-rose-600 px-4 font-bold text-white hover:bg-rose-700 disabled:cursor-wait disabled:opacity-65"
               >
                 {mutation.isPending ? "Deleting…" : "Delete task"}
               </button>

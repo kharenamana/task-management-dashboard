@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as Dialog from "@radix-ui/react-dialog";
 import { LoaderCircle, X } from "lucide-react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import type { z } from "zod";
 
 import {
@@ -40,7 +40,7 @@ const defaultValues: CreateTaskInput = {
 
 export function TaskFormDialog({
   open,
-  onOpenChange,
+  onOpenChange: setOpen,
   task,
 }: TaskFormDialogProps) {
   const createMutation = useCreateTask();
@@ -58,13 +58,23 @@ export function TaskFormDialog({
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    control,
+    formState: { errors, isDirty },
   } = useForm<TaskFormInput, unknown, CreateTaskInput>({
     resolver: zodResolver(createTaskSchema),
     defaultValues: initialValues,
   });
 
   const pending = createMutation.isPending || updateMutation.isPending;
+  const descriptionLength = (useWatch({ control, name: "description" }) ?? "")
+    .length;
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (nextOpen || pending) return;
+    if (isDirty && !window.confirm("Discard your unsaved task changes?")) {
+      return;
+    }
+    setOpen(false);
+  };
   const onSubmit = handleSubmit(async (values) => {
     setSubmitError(undefined);
     try {
@@ -73,7 +83,7 @@ export function TaskFormDialog({
       } else {
         await createMutation.mutateAsync(values);
       }
-      onOpenChange(false);
+      setOpen(false);
     } catch (error) {
       setSubmitError(
         error instanceof Error ? error.message : "Unable to save task.",
@@ -82,10 +92,13 @@ export function TaskFormDialog({
   });
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="data-[state=open]:animate-in data-[state=closed]:animate-out fixed inset-0 z-40 bg-slate-950/55 backdrop-blur-sm" />
-        <Dialog.Content className="border-border bg-card fixed top-1/2 left-1/2 z-50 max-h-[90vh] w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[1.75rem] border p-6 shadow-2xl sm:p-8">
+        <Dialog.Overlay className="dialog-overlay fixed inset-0 z-40 bg-slate-950/55 backdrop-blur-sm" />
+        <Dialog.Content
+          aria-busy={pending}
+          className="dialog-content border-border bg-card fixed top-1/2 left-1/2 z-50 max-h-[90vh] w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[1.75rem] border p-6 shadow-2xl sm:p-8"
+        >
           <div className="pr-10">
             <Dialog.Title className="text-2xl font-black">
               {task ? "Edit task" : "Create a task"}
@@ -100,13 +113,19 @@ export function TaskFormDialog({
             <button
               type="button"
               aria-label="Close task form"
-              className="hover:bg-muted absolute top-5 right-5 grid size-9 place-items-center rounded-xl transition"
+              disabled={pending}
+              className="hover:bg-muted absolute top-5 right-5 grid size-11 place-items-center rounded-xl transition disabled:opacity-50"
             >
               <X className="size-5" aria-hidden="true" />
             </button>
           </Dialog.Close>
 
-          <form onSubmit={onSubmit} noValidate className="mt-7 space-y-5">
+          <form
+            aria-label={task ? "Edit task" : "Create task"}
+            onSubmit={onSubmit}
+            noValidate
+            className="mt-7 space-y-5"
+          >
             {submitError ? (
               <p
                 role="alert"
@@ -146,17 +165,22 @@ export function TaskFormDialog({
                 maxLength={5000}
                 className={`${inputClassName} resize-y`}
                 aria-invalid={Boolean(errors.description)}
-                aria-describedby={
-                  errors.description ? "task-description-error" : undefined
-                }
+                aria-describedby={`task-description-count${errors.description ? " task-description-error" : ""}`}
                 {...register("description")}
               />
+              <p
+                id="task-description-count"
+                className="text-muted-foreground mt-1.5 text-right text-xs tabular-nums"
+              >
+                {descriptionLength.toLocaleString()} / 5,000 characters
+              </p>
               <FieldError
                 id="task-description-error"
                 message={errors.description?.message}
               />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <fieldset className="grid gap-4 sm:grid-cols-2">
+              <legend className="sr-only">Workflow settings</legend>
               <div>
                 <label htmlFor="task-status" className="text-sm font-bold">
                   Status
@@ -189,7 +213,7 @@ export function TaskFormDialog({
                   ))}
                 </select>
               </div>
-            </div>
+            </fieldset>
             <div>
               <label htmlFor="task-due-date" className="text-sm font-bold">
                 Due date{" "}
@@ -219,7 +243,7 @@ export function TaskFormDialog({
                 <button
                   type="button"
                   disabled={pending}
-                  className="border-border hover:bg-muted rounded-xl border px-4 py-2.5 font-bold"
+                  className="border-border hover:bg-muted min-h-11 rounded-xl border px-4 font-bold"
                 >
                   Cancel
                 </button>
@@ -227,7 +251,7 @@ export function TaskFormDialog({
               <button
                 type="submit"
                 disabled={pending}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-2.5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-65"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-65"
               >
                 {pending ? (
                   <LoaderCircle

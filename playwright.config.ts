@@ -7,6 +7,15 @@ if (existsSync(".env.test.local")) {
 }
 
 const baseURL = process.env.E2E_BASE_URL ?? "http://127.0.0.1:3000";
+const windowsBrowserExecutable =
+  process.platform === "win32"
+    ? [
+        "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+        "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
+        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      ].find((path) => existsSync(path))
+    : undefined;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -17,9 +26,12 @@ export default defineConfig({
   reporter: process.env.CI ? [["line"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL,
+    ...(windowsBrowserExecutable
+      ? { launchOptions: { executablePath: windowsBrowserExecutable } }
+      : {}),
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
-    video: "retain-on-failure",
+    video: windowsBrowserExecutable ? "off" : "retain-on-failure",
   },
   ...(!process.env.E2E_BASE_URL
     ? {

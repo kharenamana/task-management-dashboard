@@ -26,6 +26,8 @@ describe("LoginForm", () => {
     const user = userEvent.setup();
     render(<LoginForm />);
 
+    expect(screen.getByRole("form", { name: "Sign in" })).toBeVisible();
+
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
     expect(

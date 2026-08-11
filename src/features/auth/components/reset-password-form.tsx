@@ -42,7 +42,12 @@ export function ResetPasswordForm() {
   });
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-5">
+    <form
+      aria-label="Set new password"
+      onSubmit={onSubmit}
+      noValidate
+      className="space-y-5"
+    >
       <FormStatus message={message} />
       <div>
         <label htmlFor="password" className="text-sm font-bold">
@@ -90,7 +95,7 @@ export function ResetPasswordForm() {
       <p className="text-center text-sm">
         <Link
           href="/forgot-password"
-          className="font-bold text-violet-600 hover:underline dark:text-violet-300"
+          className="text-accent font-bold hover:underline"
         >
           Request a fresh link
         </Link>

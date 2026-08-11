@@ -34,7 +34,12 @@ export function ForgotPasswordForm() {
   });
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-5">
+    <form
+      aria-label="Request password reset"
+      onSubmit={onSubmit}
+      noValidate
+      className="space-y-5"
+    >
       <FormStatus message={result?.message} success={result?.success} />
       <div>
         <label htmlFor="email" className="text-sm font-bold">
@@ -56,10 +61,7 @@ export function ForgotPasswordForm() {
         {isSubmitting ? "Sending link…" : "Send reset link"}
       </SubmitButton>
       <p className="text-center text-sm">
-        <Link
-          href="/login"
-          className="font-bold text-violet-600 hover:underline dark:text-violet-300"
-        >
+        <Link href="/login" className="text-accent font-bold hover:underline">
           Return to sign in
         </Link>
       </p>
