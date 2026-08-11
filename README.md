@@ -25,6 +25,20 @@ Browser -> Next.js proxy/layouts -> Route Handlers -> Supabase Auth/Postgres
 
 See [architecture](docs/architecture.md), [database schema](docs/database.md), [Task API](docs/api.md), and [security decisions](docs/security.md).
 
+## Public case study
+
+The statically rendered public site documents both the product and the engineering decisions behind it:
+
+- `/` — product overview and working-demo entry point
+- `/features` — workflow, validation, responsive behavior, and themes
+- `/architecture` — rendering, data flow, testing, and scaling boundaries
+- `/security` — authentication, RLS, validation, headers, and limitations
+- `/about` — problem, trade-offs, challenges, and outcomes
+- `/faq` — concise product and implementation answers
+- `/privacy` — beta data-handling summary
+
+Each route has unique canonical and social metadata. The site also publishes a sitemap, robots policy, manifest, generated icons and Open Graph image, plus matching WebSite, SoftwareApplication, TechArticle, FAQPage, and breadcrumb structured data.
+
 ## Local setup
 
 Requirements: Node.js 24.x, pnpm 11.16.0, and a Supabase project. Docker is needed only for the optional local Supabase stack.

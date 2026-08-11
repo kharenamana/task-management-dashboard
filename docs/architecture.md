@@ -6,7 +6,7 @@ TaskFlow is a server-first Next.js application for isolated, authenticated user 
 
 ## Application boundaries
 
-- `src/app`: routes, layouts, metadata, loading/error boundaries, and Route Handlers.
+- `src/app`: marketing, authentication, and dashboard route groups; metadata routes; loading/error boundaries; and Route Handlers.
 - `src/features`: domain-specific schemas, data access, hooks, and UI for authentication and tasks.
 - `src/components`: reusable presentation primitives without domain knowledge.
 - `src/lib`: infrastructure such as environment validation, Supabase clients, and shared API utilities.
@@ -17,6 +17,8 @@ TaskFlow is a server-first Next.js application for isolated, authenticated user 
 ## Rendering and data flow
 
 Server Components are the default. The authenticated dashboard layout verifies the session on the server and shares a request-cached auth context with the page. The URL-selected initial task query is dehydrated into TanStack Query; metrics are fetched client-side with the user's local calendar date so overdue boundaries remain correct. Interactive client components own filters, forms, and mutations. Client requests use same-origin Route Handlers, which validate input and pass one authenticated SSR Supabase client through the service and repository layers. PostgreSQL RLS is the final authorization boundary.
+
+The seven public case-study routes are static Server Components. Their shared marketing layout provides crawlable navigation, a skip link, and a footer without mounting client providers. Public dark mode follows the browser color scheme in CSS. Dashboard-only providers mount theme persistence, TanStack Query, notifications, and development diagnostics after authorization.
 
 ```mermaid
 flowchart LR
@@ -44,6 +46,10 @@ src/lib/             environment and Supabase infrastructure
 supabase/             migrations, local seed, and transactional RLS checks
 docs/                 architecture, API, security, database, testing, deployment
 ```
+
+## Search and social discovery
+
+`src/config/site.ts` is the single source for the canonical origin, public route list, navigation, repository URL, and page metadata helper. Metadata file conventions generate robots, sitemap, manifest, icons, and the social image. Structured data mirrors visible content: product entities appear on the homepage, the architecture route is a technical article, FAQ answers match the rendered disclosures, and nested pages include breadcrumbs. Authentication, dashboard, callback, and API routes are excluded from indexing.
 
 ## Security posture
 

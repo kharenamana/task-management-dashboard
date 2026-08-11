@@ -10,6 +10,11 @@
 
 - Scoped task-query providers and dialogs to the dashboard, narrowed session proxy coverage, reused authenticated Supabase request clients, and consolidated dashboard metrics into one RLS-protected aggregate function
 
+### Added
+
+- Added seven static public case-study routes with unique canonical, Open Graph, and Twitter metadata
+- Added sitemap, robots policy, web manifest, generated icons/social image, crawlable navigation, and content-matched structured data
+
 ## 0.1.0 - 2026-08-11
 
 ### Added
