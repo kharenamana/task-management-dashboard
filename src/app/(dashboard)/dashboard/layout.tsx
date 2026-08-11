@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 
+import { ThemeToggle } from "@/components/theme-toggle";
 import { logoutAction } from "@/features/auth/actions";
 import { requirePageUser } from "@/features/auth/session";
 
@@ -28,6 +29,7 @@ export default async function DashboardLayout({
             <span className="text-muted-foreground hidden max-w-56 truncate text-sm sm:block">
               {user.email}
             </span>
+            <ThemeToggle />
             <form action={logoutAction}>
               <button
                 type="submit"

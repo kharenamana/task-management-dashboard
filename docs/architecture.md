@@ -31,6 +31,8 @@ Authentication uses separate browser, server, and proxy Supabase clients. The ro
 
 The task feature separates public schemas/contracts, a server-only service, and a server-only Supabase repository. Route Handlers authenticate before parsing bodies, validate URL/body input, and return normalized responses. Repository operations include explicit `user_id` predicates in addition to RLS. Public task objects omit ownership identifiers and map database snake-case fields to camel case.
 
+The dashboard Server Component authenticates and hydrates the URL-selected task query. Client components use TanStack Query for background refresh, metrics, and mutations. Completion and deletion update matching list caches optimistically with rollback; authoritative lists and metrics are revalidated afterward. Search, filters, sorting, and pagination live in the URL, while only temporary dialog/form state remains local.
+
 ## Security posture
 
 Only the Supabase URL and publishable key are exposed to the browser. No service-role credential is required. Proxy-based session refresh improves navigation behavior but is never treated as the only authorization check. All data mutations are validated at the HTTP boundary and constrained by RLS.

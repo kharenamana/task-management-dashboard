@@ -4,7 +4,7 @@ TaskFlow is a secure, multi-user task management dashboard built with Next.js, T
 
 ## Current status
 
-The project is being delivered in verified phases. The foundation, Supabase database/RLS layer, secure authentication flow, and validated owner-scoped Task API are complete. Dashboard interactions, end-to-end tests, and release documentation follow in focused commits.
+The project is being delivered in verified phases. The foundation, Supabase database/RLS layer, secure authentication flow, validated owner-scoped Task API, and responsive dashboard experience are complete. End-to-end tests and release documentation follow in focused commits.
 
 ## Prerequisites
 
