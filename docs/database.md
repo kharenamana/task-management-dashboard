@@ -45,7 +45,9 @@ pnpm supabase:test-rls
 
 The script creates two temporary users, impersonates user A through JWT claims, verifies that user B's task is invisible and cannot be updated, deleted, or targeted by insert, verifies owned update succeeds, and rolls everything back.
 
-For the hosted project, the same SQL can be run through the authenticated Supabase management connection. Never run it through a client-visible key.
+For the hosted project, the same SQL can be run through the authenticated Supabase management connection. The five assertions passed transactionally on 2026-08-11 after replacing invalid nested data-modifying CTEs with top-level mutations and post-condition checks. Never run it through a client-visible key.
+
+The hosted Supabase security advisor reported no findings on 2026-08-11. The performance advisor reported only unused-index informational notices, which are expected before meaningful beta traffic; retain the ownership/filter/due-date/search indexes and reassess them using production query statistics.
 
 ## Migration workflow
 

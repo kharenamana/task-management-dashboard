@@ -19,11 +19,21 @@ TaskFlow uses defense in depth. Authentication, server authorization, HTTP valid
 - Database constraints enforce field lengths and enum values even if application validation is bypassed.
 - Local seed identities contain no passwords and the seed is never applied to hosted environments.
 - Local secrets belong in ignored `.env.local` files. `.env.example` contains names and placeholders only.
-- Next.js emits content-type, frame, referrer, permissions, CSP, and production HSTS headers. The CSP will be reviewed as authenticated routes and Supabase calls are introduced.
+- Next.js emits content-type, frame, referrer, permissions, CSP, and production HSTS headers. The reviewed CSP restricts connections to the same origin and Supabase; inline scripts/styles remain allowed where the Next.js runtime and styling stack require them.
+
+## Hosted authentication configuration
+
+The production Supabase Auth Site URL is `https://task-management-dashboard-tau-fawn.vercel.app`. The allowlist contains:
+
+- `http://localhost:3000/**`
+- `https://task-management-dashboard-tau-fawn.vercel.app/auth/callback`
+- `https://*-namanas-projects.vercel.app/**` for Git-linked preview deployments
+
+Keep the production callback exact. The preview wildcard is a beta convenience and should be narrowed or protected when untrusted contributors can create previews.
 
 ## Verification
 
-`supabase/tests/rls_ownership.sql` performs a transactional two-user test. User A cannot select, update, delete, or insert for user B, while owned mutation succeeds. The same script passed against the hosted project and rolled back all temporary data. Supabase's security advisor currently reports no findings.
+`supabase/tests/rls_ownership.sql` performs a transactional five-assertion, two-user test. User A cannot select, update, delete, or insert for user B, while an owned mutation succeeds. The corrected script passed against the hosted project on 2026-08-11 and rolled back all temporary data. Supabase's security advisor reported no findings on that date.
 
 ## Known beta limitations
 
@@ -31,7 +41,9 @@ TaskFlow uses defense in depth. Authentication, server authorization, HTTP valid
 - The beta relies on Supabase Auth's platform protections; there is no additional application-level login rate limiter or CAPTCHA yet.
 - No MFA, audit log, shared workspaces, roles, invitations, or organization policy controls.
 - Supabase and Vercel free-tier quotas, cold starts, and transactional email limits apply.
-- Vercel Deployment Protection currently guards generated deployment URLs. Public production access requires an explicit project-level policy decision or a custom domain.
+- Public production is intentionally available for portfolio review; Git-linked previews should remain access-controlled where the plan supports it.
 - Abuse monitoring, incident alerting, backup-restore drills, dependency scanning, and penetration testing are commercial-launch work.
+
+Before a commercial launch, add task-API rate limiting, CAPTCHA or bot protection for exposed auth flows, MFA, an immutable audit trail, custom SMTP with a verified domain, centralized error/latency monitoring, backup-restore drills, and a formal vulnerability-reporting channel.
 
 Report suspected vulnerabilities privately to the repository owner; do not open a public issue containing exploit details or credentials.
