@@ -36,33 +36,37 @@ select is(
   'user A cannot select user B tasks'
 );
 
+update public.tasks
+set title = 'Cross-user update must not happen'
+where id = 'bbbbbbbb-0000-4000-8000-000000000001';
+
+reset role;
 select is(
   (
-    with changed as (
-      update public.tasks
-      set title = 'Cross-user update must not happen'
-      where id = 'bbbbbbbb-0000-4000-8000-000000000001'
-      returning 1
-    )
-    select count(*) from changed
+    select title
+    from public.tasks
+    where id = 'bbbbbbbb-0000-4000-8000-000000000001'
   ),
-  0::bigint,
+  'User B task',
   'user A cannot update user B task'
 );
 
+set local role authenticated;
+delete from public.tasks
+where id = 'bbbbbbbb-0000-4000-8000-000000000001';
+
+reset role;
 select is(
   (
-    with removed as (
-      delete from public.tasks
-      where id = 'bbbbbbbb-0000-4000-8000-000000000001'
-      returning 1
-    )
-    select count(*) from removed
+    select count(*)
+    from public.tasks
+    where id = 'bbbbbbbb-0000-4000-8000-000000000001'
   ),
-  0::bigint,
+  1::bigint,
   'user A cannot delete user B task'
 );
 
+set local role authenticated;
 select throws_ok(
   $rls$
     insert into public.tasks (user_id, title)
@@ -73,20 +77,22 @@ select throws_ok(
   'user A cannot insert a task for user B'
 );
 
+reset role;
+set local role authenticated;
+update public.tasks
+set title = 'User A task updated'
+where id = 'aaaaaaaa-0000-4000-8000-000000000001';
+
+reset role;
 select is(
   (
-    with changed as (
-      update public.tasks
-      set title = 'User A task updated'
-      where id = 'aaaaaaaa-0000-4000-8000-000000000001'
-      returning 1
-    )
-    select count(*) from changed
+    select title
+    from public.tasks
+    where id = 'aaaaaaaa-0000-4000-8000-000000000001'
   ),
-  1::bigint,
+  'User A task updated',
   'user A can update their own task'
 );
 
 select * from finish();
-reset role;
 rollback;
