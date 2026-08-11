@@ -41,6 +41,19 @@ test("reduced-motion preference removes marketing entrance animation", async ({
   );
 });
 
+test("landing page avoids Supabase runtime requests", async ({ page }) => {
+  const supabaseRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("supabase.co")) {
+      supabaseRequests.push(request.url());
+    }
+  });
+
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  expect(supabaseRequests).toEqual([]);
+});
+
 test("authenticated dashboard has no blocking axe findings", async ({
   page,
 }) => {

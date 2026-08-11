@@ -16,6 +16,12 @@
 - Added seven static public case-study routes with unique canonical, Open Graph, and Twitter metadata
 - Added sitemap, robots policy, web manifest, generated icons/social image, crawlable navigation, and content-matched structured data
 - Added named forms, consistent skip targets, semantic table/action labels, reduced-motion behavior, and focused axe Playwright checks
+- Added a dependency-free bundle-analysis command and a browser assertion that the landing page makes no Supabase runtime request
+
+### Verification
+
+- Re-ran the hosted six-assertion RLS test, Supabase advisors, formatting, lint, strict typecheck, 69 unit/component tests, the production build, and the credential-free Playwright release checks
+- Authenticated dashboard accessibility and task-lifecycle checks remain gated on the documented dedicated confirmed E2E account
 
 ## 0.1.0 - 2026-08-11
 

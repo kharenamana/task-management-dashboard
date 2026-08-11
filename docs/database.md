@@ -49,7 +49,7 @@ The script creates two temporary users, impersonates user A through JWT claims, 
 
 For the hosted project, the same SQL can be run through the authenticated Supabase management connection. The six ownership and metrics-isolation assertions passed transactionally on 2026-08-11. Never run them through a client-visible key.
 
-The hosted Supabase security advisor reported no findings on 2026-08-11. The performance advisor reported only unused-index informational notices, which are expected before meaningful beta traffic; retain the ownership/filter/due-date/search indexes and reassess them using production query statistics.
+The hosted Supabase security advisor reported no database-function or RLS findings on 2026-08-11. It reports the optional Auth leaked-password check as disabled; enable it before a broader public launch. The performance advisor reported only unused-index informational notices, which are expected before meaningful beta traffic; retain the ownership/filter/due-date/search indexes and reassess them using production query statistics.
 
 ## Migration workflow
 

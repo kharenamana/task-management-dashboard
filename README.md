@@ -73,9 +73,10 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm analyze
 ```
 
-`pnpm verify` runs the complete default pipeline. The focused Playwright flow requires a deployed URL and a dedicated confirmed test account; see [testing](docs/testing.md) for the exact setup.
+`pnpm verify` runs the complete default pipeline. `pnpm analyze` uses Next.js's built-in Turbopack analyzer and writes ignored analysis output without adding an analyzer dependency. The focused Playwright flow requires a deployed URL and a dedicated confirmed test account; see [testing](docs/testing.md) for the exact setup.
 
 ## Deployment and operations
 
