@@ -4,11 +4,16 @@ TaskFlow uses Supabase Postgres 17. The committed migration is the source of tru
 
 ## Data model
 
+| Table      | Primary/owner key                   | Main fields                                                                                          |
+| ---------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `profiles` | `id` → `auth.users.id`              | `display_name`, `created_at`, `updated_at`                                                           |
+| `tasks`    | UUID `id`, `user_id` → `auth.users` | `title`, `description`, `status`, `priority`, `due_date`, `completed_at`, `created_at`, `updated_at` |
+
 `profiles.id` is both the primary key and a cascading foreign key to `auth.users.id`. An `AFTER INSERT` trigger on `auth.users` creates one profile and copies a bounded `full_name` value from user metadata.
 
 `tasks` uses UUID primary keys and an indexed `user_id` foreign key. Status is one of `pending`, `in_progress`, or `completed`; priority is one of `low`, `medium`, or `high`. Due dates are nullable calendar dates. Completion and update timestamps are maintained by database triggers.
 
-Title and description lengths are enforced in Postgres in addition to application Zod validation. Composite indexes support common owner/status/priority/due-date access paths. A trigram GIN index supports case-insensitive title search.
+Title and description lengths are enforced in Postgres in addition to application Zod validation. Composite indexes support common owner/status/priority/due-date access paths. A follow-up migration aligns the raw-title trigram GIN index with the API's case-insensitive `ILIKE` search expression.
 
 ## Access model
 

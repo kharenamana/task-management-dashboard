@@ -20,7 +20,10 @@ export async function requireApiUser(): Promise<ApiAuthResult> {
             message: "Sign in to continue.",
           },
         },
-        { status: 401 },
+        {
+          status: 401,
+          headers: { "Cache-Control": "private, no-store" },
+        },
       ),
     };
   }

@@ -9,6 +9,9 @@ TaskFlow uses defense in depth. Authentication, server authorization, HTTP valid
 - Server authorization reads cryptographically verified claims with `auth.getClaims()` rather than trusting local session storage.
 - Authentication redirects pass through a same-origin path allowlist to prevent open redirects. Callback failures are reduced to a generic public message.
 - Signup, login, and recovery inputs are independently validated at the browser form and server-action boundaries with shared Zod schemas. Authentication provider errors are mapped to a small sanitized message set.
+- Task Route Handlers authenticate before parsing request bodies, reject unexpected mutation fields, and validate IDs, queries, dates, pagination, and JSON independently of database constraints.
+- Task repositories add explicit authenticated `user_id` predicates to every operation while RLS remains the final ownership boundary. Missing and non-owned IDs produce the same sanitized `404` response.
+- Authenticated API responses are private and non-cacheable. Public errors never include raw Supabase or PostgreSQL details, and public task objects omit `user_id`.
 - The browser receives only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. A service-role key is not required and must never be added to client code, Vercel, CI, or repository history.
 - Every user-facing table has RLS enabled. Task policies compare the indexed `user_id` column to `(select auth.uid())` for select, insert, update, and delete. Updates and inserts include `WITH CHECK` ownership enforcement.
 - Anonymous users have no privileges on profiles or tasks. Authenticated users receive only the table operations required by the product.
