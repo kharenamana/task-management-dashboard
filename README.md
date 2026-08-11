@@ -4,7 +4,7 @@ TaskFlow is a secure, multi-user task management dashboard built with Next.js, T
 
 ## Current status
 
-The project is being delivered in verified phases. The application foundation and Supabase database/RLS layer are complete. Authentication, task APIs, dashboard interactions, end-to-end tests, and release documentation follow in focused commits.
+The project is being delivered in verified phases. The foundation, Supabase database/RLS layer, and secure authentication flow are complete. Task APIs, dashboard interactions, end-to-end tests, and release documentation follow in focused commits.
 
 ## Prerequisites
 
@@ -18,6 +18,20 @@ The project is being delivered in verified phases. The application foundation an
 1. Install dependencies with `pnpm install --frozen-lockfile`.
 2. Copy `.env.example` to `.env.local` and replace placeholders.
 3. Run `pnpm dev` and open `http://localhost:3000`.
+
+### Authentication setup
+
+In Supabase Auth URL Configuration, use `http://localhost:3000` as the local Site URL and allow `http://localhost:3000/auth/callback` as a redirect URL. Email/password signup must be enabled. Keep email confirmation enabled for production-like local testing.
+
+Manual auth routes:
+
+- `/signup` — create an account and request verification
+- `/login` — authenticate and test protected-route redirects
+- `/forgot-password` — request a recovery email
+- `/reset-password` — reachable from a valid recovery callback
+- `/dashboard` — server-protected authenticated route
+
+Deployment is intentionally deferred until the dashboard experience is complete after Phase 4.
 
 Never commit `.env.local` or any credential. `NEXT_PUBLIC_` variables are intentionally browser-visible and must never contain a Supabase secret or service-role key.
 

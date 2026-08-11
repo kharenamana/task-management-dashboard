@@ -18,6 +18,8 @@ TaskFlow is a server-first Next.js application for isolated, authenticated user 
 
 Server Components are the default. The authenticated dashboard layout verifies the session on the server. Its initial task and metrics queries are dehydrated into TanStack Query; interactive client components then own filters, forms, and mutations. Client requests use same-origin Route Handlers, which validate input and execute through an SSR Supabase client carrying the user's cookie session. PostgreSQL RLS is the final authorization boundary.
 
+Authentication uses separate browser, server, and proxy Supabase clients. The root `proxy.ts` refreshes cookie sessions and provides early redirects; the protected dashboard layout and the reusable API guard independently verify signed claims. Forms use React Hook Form for accessible browser feedback and invoke server actions that repeat validation before calling Supabase Auth.
+
 ## Security posture
 
 Only the Supabase URL and publishable key are exposed to the browser. No service-role credential is required. Proxy-based session refresh improves navigation behavior but is never treated as the only authorization check. All data mutations are validated at the HTTP boundary and constrained by RLS.

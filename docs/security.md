@@ -5,6 +5,10 @@ TaskFlow uses defense in depth. Authentication, server authorization, HTTP valid
 ## Current controls
 
 - Supabase Auth is the only identity source. No mock or in-memory authentication is used.
+- `@supabase/ssr` stores sessions in secure cookies. `proxy.ts` refreshes tokens and provides an early navigation redirect, while protected layouts, API boundaries, and RLS independently enforce authorization.
+- Server authorization reads cryptographically verified claims with `auth.getClaims()` rather than trusting local session storage.
+- Authentication redirects pass through a same-origin path allowlist to prevent open redirects. Callback failures are reduced to a generic public message.
+- Signup, login, and recovery inputs are independently validated at the browser form and server-action boundaries with shared Zod schemas. Authentication provider errors are mapped to a small sanitized message set.
 - The browser receives only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. A service-role key is not required and must never be added to client code, Vercel, CI, or repository history.
 - Every user-facing table has RLS enabled. Task policies compare the indexed `user_id` column to `(select auth.uid())` for select, insert, update, and delete. Updates and inserts include `WITH CHECK` ownership enforcement.
 - Anonymous users have no privileges on profiles or tasks. Authenticated users receive only the table operations required by the product.
@@ -21,6 +25,7 @@ TaskFlow uses defense in depth. Authentication, server authorization, HTTP valid
 ## Known beta limitations
 
 - No application-level task API rate limiter yet.
+- The beta relies on Supabase Auth's platform protections; there is no additional application-level login rate limiter or CAPTCHA yet.
 - No MFA, audit log, shared workspaces, roles, invitations, or organization policy controls.
 - Supabase and Vercel free-tier quotas, cold starts, and transactional email limits apply.
 - Vercel Deployment Protection currently guards generated deployment URLs. Public production access requires an explicit project-level policy decision or a custom domain.

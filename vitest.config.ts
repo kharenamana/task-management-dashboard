@@ -1,4 +1,9 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
+
+const sourceDirectory = fileURLToPath(
+  new URL("./src", import.meta.url),
+).replaceAll("\\", "/");
 
 export default defineConfig({
   test: {
@@ -16,7 +21,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": new URL("./src", import.meta.url).pathname,
+      "@": sourceDirectory,
     },
   },
 });
