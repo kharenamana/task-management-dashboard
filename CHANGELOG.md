@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Corrected optimistic task totals across cached filters and pages, retained deletion context on recoverable failures, sanitized URL filters independently, and refreshed date-sensitive dashboard state after midnight or window focus
+
 ## 0.1.0 - 2026-08-11
 
 ### Added

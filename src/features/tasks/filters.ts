@@ -14,6 +14,18 @@ export function taskQueryFromRecord(
       Array.isArray(value) ? value[0] : value,
     ]),
   );
-  const parsed = taskListQuerySchema.safeParse(normalized);
-  return parsed.success ? parsed.data : defaultTaskQuery;
+  const sanitized: Record<string, unknown> = {};
+  for (const key of [
+    "q",
+    "status",
+    "priority",
+    "sort",
+    "page",
+    "pageSize",
+  ] as const) {
+    const parsed = taskListQuerySchema.shape[key].safeParse(normalized[key]);
+    if (parsed.success) sanitized[key] = parsed.data;
+  }
+
+  return taskListQuerySchema.parse(sanitized);
 }

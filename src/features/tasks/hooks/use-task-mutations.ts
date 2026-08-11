@@ -4,36 +4,18 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { patchTask, postTask, removeTask } from "@/features/tasks/api-client";
+import {
+  optimisticallyDeleteTask,
+  optimisticallyToggleTask,
+  type TaskListCache,
+} from "@/features/tasks/optimistic-cache";
 import { taskKeys } from "@/features/tasks/query-keys";
 import type { TaskListQuery } from "@/features/tasks/schemas";
 import type {
-  ApiSuccessBody,
   CreateTaskInput,
-  PaginationMeta,
   Task,
   UpdateTaskInput,
 } from "@/features/tasks/types";
-
-type TaskListCache = ApiSuccessBody<Task[]>;
-
-function decrementTotal(meta: PaginationMeta | undefined) {
-  if (!meta) return undefined;
-  const total = Math.max(0, meta.total - 1);
-  return {
-    ...meta,
-    total,
-    totalPages: Math.ceil(total / meta.pageSize),
-  };
-}
-
-function matchesQuery(task: Task, query: TaskListQuery) {
-  if (query.status && task.status !== query.status) return false;
-  if (query.priority && task.priority !== query.priority) return false;
-  if (query.q && !task.title.toLowerCase().includes(query.q.toLowerCase())) {
-    return false;
-  }
-  return true;
-}
 
 export function useCreateTask() {
   const queryClient = useQueryClient();
@@ -84,21 +66,10 @@ export function useToggleTask() {
       snapshots.forEach(([key, current]) => {
         if (!current) return;
         const cachedQuery = key[2] as TaskListQuery | undefined;
-        const containedTask = current.data.some((item) => item.id === task.id);
-        const keepTask =
-          !cachedQuery || matchesQuery(optimisticTask, cachedQuery);
-        const data = current.data
-          .map((item) => (item.id === task.id ? optimisticTask : item))
-          .filter((item) => item.id !== task.id || keepTask);
-        const meta =
-          containedTask && !keepTask
-            ? decrementTotal(current.meta)
-            : current.meta;
-        queryClient.setQueryData<TaskListCache>(key, {
-          ...current,
-          data,
-          ...(meta ? { meta } : {}),
-        });
+        queryClient.setQueryData<TaskListCache>(
+          key,
+          optimisticallyToggleTask(current, cachedQuery, task, optimisticTask),
+        );
       });
       return { snapshots };
     },
@@ -127,19 +98,14 @@ export function useDeleteTask() {
       const snapshots = queryClient.getQueriesData<TaskListCache>({
         queryKey: taskKeys.lists(),
       });
-      queryClient.setQueriesData<TaskListCache>(
-        { queryKey: taskKeys.lists() },
-        (current) =>
-          current
-            ? {
-                ...current,
-                data: current.data.filter((item) => item.id !== task.id),
-                ...(current.meta
-                  ? { meta: decrementTotal(current.meta)! }
-                  : {}),
-              }
-            : current,
-      );
+      snapshots.forEach(([key, current]) => {
+        if (!current) return;
+        const cachedQuery = key[2] as TaskListQuery | undefined;
+        queryClient.setQueryData<TaskListCache>(
+          key,
+          optimisticallyDeleteTask(current, cachedQuery, task),
+        );
+      });
       return { snapshots };
     },
     onError: (error: Error, _task, context) => {

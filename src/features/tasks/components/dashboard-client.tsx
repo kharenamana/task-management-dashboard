@@ -13,8 +13,8 @@ import {
   TaskLoading,
 } from "@/features/tasks/components/task-state";
 import { TaskToolbar } from "@/features/tasks/components/task-toolbar";
-import { getLocalToday } from "@/features/tasks/date";
 import { taskQueryFromRecord } from "@/features/tasks/filters";
+import { useLocalToday } from "@/features/tasks/hooks/use-local-today";
 import { useToggleTask } from "@/features/tasks/hooks/use-task-mutations";
 import { useTaskMetrics, useTasks } from "@/features/tasks/hooks/use-tasks";
 import type { TaskListQuery } from "@/features/tasks/schemas";
@@ -41,7 +41,7 @@ export function DashboardClient({
   const [formOpen, setFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [deletingTask, setDeletingTask] = useState<Task | null>(null);
-  const today = useMemo(() => getLocalToday(), []);
+  const today = useLocalToday();
   const tasksQuery = useTasks(query);
   const metricsQuery = useTaskMetrics(today);
   const toggleMutation = useToggleTask();

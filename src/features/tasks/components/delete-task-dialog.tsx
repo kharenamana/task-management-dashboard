@@ -14,17 +14,25 @@ export function DeleteTaskDialog({
   onClose: () => void;
 }) {
   const mutation = useDeleteTask();
-  const confirm = () => {
+  const confirm = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     if (!task) return;
-    mutation.mutate(task);
-    onClose();
+    try {
+      await mutation.mutateAsync(task);
+      onClose();
+    } catch {
+      // The mutation owns the sanitized error state and toast feedback.
+    }
   };
 
   return (
     <AlertDialog.Root
       open={Boolean(task)}
       onOpenChange={(open) => {
-        if (!open) onClose();
+        if (!open && !mutation.isPending) {
+          mutation.reset();
+          onClose();
+        }
       }}
     >
       <AlertDialog.Portal>
@@ -40,10 +48,19 @@ export function DeleteTaskDialog({
             “{task?.title}” will be permanently removed. This action cannot be
             undone.
           </AlertDialog.Description>
+          {mutation.isError ? (
+            <p
+              role="alert"
+              className="mt-4 rounded-xl bg-rose-500/10 px-3 py-2 text-sm font-semibold text-rose-700 dark:text-rose-300"
+            >
+              {mutation.error.message}
+            </p>
+          ) : null}
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <AlertDialog.Cancel asChild>
               <button
                 type="button"
+                disabled={mutation.isPending}
                 className="border-border hover:bg-muted rounded-xl border px-4 py-2.5 font-bold"
               >
                 Keep task
@@ -53,9 +70,10 @@ export function DeleteTaskDialog({
               <button
                 type="button"
                 onClick={confirm}
-                className="rounded-xl bg-rose-600 px-4 py-2.5 font-bold text-white hover:bg-rose-700"
+                disabled={mutation.isPending}
+                className="rounded-xl bg-rose-600 px-4 py-2.5 font-bold text-white hover:bg-rose-700 disabled:cursor-wait disabled:opacity-65"
               >
-                Delete task
+                {mutation.isPending ? "Deleting…" : "Delete task"}
               </button>
             </AlertDialog.Action>
           </div>
