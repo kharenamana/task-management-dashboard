@@ -55,6 +55,7 @@ pnpm supabase:test-rls
 - [Database and local Supabase](docs/database.md)
 - [Task API](docs/api.md)
 - [Security](docs/security.md)
+- [Testing and E2E credentials](docs/testing.md)
 - The deployment guide is added in its corresponding delivery phase.
 
 ## License
