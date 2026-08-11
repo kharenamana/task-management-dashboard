@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 
-import { AppProviders } from "@/providers/app-providers";
+import { RootThemeProvider } from "@/providers/theme-provider";
 
 import "./globals.css";
 
@@ -56,7 +56,7 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <body>
-        <AppProviders>{children}</AppProviders>
+        <RootThemeProvider>{children}</RootThemeProvider>
       </body>
     </html>
   );

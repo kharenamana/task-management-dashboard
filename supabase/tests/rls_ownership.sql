@@ -21,7 +21,7 @@ values
     'User B task'
   );
 
-select plan(5);
+select plan(6);
 
 set local role authenticated;
 set local "request.jwt.claims" = '{"sub":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","role":"authenticated"}';
@@ -34,6 +34,12 @@ select is(
   ),
   0::bigint,
   'user A cannot select user B tasks'
+);
+
+select is(
+  (select total from public.get_task_metrics('2030-01-01')),
+  1::bigint,
+  'task metrics include only the authenticated owner rows'
 );
 
 update public.tasks

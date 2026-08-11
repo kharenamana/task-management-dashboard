@@ -1,6 +1,12 @@
 import { CalendarDays, Check, Pencil, RotateCcw, Trash2 } from "lucide-react";
 
 import { formatDueDate } from "@/features/tasks/date";
+import {
+  taskPriorityLabels,
+  taskPriorityStyles,
+  taskStatusLabels,
+  taskStatusStyles,
+} from "@/features/tasks/presentation";
 import type { Task } from "@/features/tasks/types";
 
 type TaskListProps = {
@@ -11,23 +17,6 @@ type TaskListProps = {
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
 };
-
-const statusStyles = {
-  pending: "bg-amber-500/10 text-amber-700 dark:text-amber-300",
-  in_progress: "bg-blue-500/10 text-blue-700 dark:text-blue-300",
-  completed: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
-};
-const priorityStyles = {
-  low: "bg-slate-500/10 text-slate-700 dark:text-slate-300",
-  medium: "bg-violet-500/10 text-violet-700 dark:text-violet-300",
-  high: "bg-rose-500/10 text-rose-700 dark:text-rose-300",
-};
-
-function label(value: string) {
-  return value
-    .replace("_", " ")
-    .replace(/^./u, (character) => character.toUpperCase());
-}
 
 function DueDate({ task, today }: { task: Task; today: string }) {
   const overdue = Boolean(
@@ -44,13 +33,21 @@ function DueDate({ task, today }: { task: Task; today: string }) {
   );
 }
 
+type TaskActionsProps = {
+  task: Task;
+  togglingId?: string | undefined;
+  onToggle: (task: Task) => void;
+  onEdit: (task: Task) => void;
+  onDelete: (task: Task) => void;
+};
+
 function TaskActions({
   task,
   togglingId,
   onToggle,
   onEdit,
   onDelete,
-}: Omit<TaskListProps, "tasks" | "today"> & { task: Task }) {
+}: TaskActionsProps) {
   const completed = task.status === "completed";
   return (
     <div className="flex items-center justify-end gap-1">
@@ -133,16 +130,16 @@ export function TaskList(props: TaskListProps) {
                   </td>
                   <td className="px-4 py-4">
                     <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-bold ${statusStyles[task.status]}`}
+                      className={`rounded-full px-2.5 py-1 text-xs font-bold ${taskStatusStyles[task.status]}`}
                     >
-                      {label(task.status)}
+                      {taskStatusLabels[task.status]}
                     </span>
                   </td>
                   <td className="px-4 py-4">
                     <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-bold ${priorityStyles[task.priority]}`}
+                      className={`rounded-full px-2.5 py-1 text-xs font-bold ${taskPriorityStyles[task.priority]}`}
                     >
-                      {label(task.priority)}
+                      {taskPriorityLabels[task.priority]}
                     </span>
                   </td>
                   <td className="px-4 py-4">
@@ -181,14 +178,14 @@ export function TaskList(props: TaskListProps) {
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span
-                className={`rounded-full px-2.5 py-1 text-xs font-bold ${statusStyles[task.status]}`}
+                className={`rounded-full px-2.5 py-1 text-xs font-bold ${taskStatusStyles[task.status]}`}
               >
-                {label(task.status)}
+                {taskStatusLabels[task.status]}
               </span>
               <span
-                className={`rounded-full px-2.5 py-1 text-xs font-bold ${priorityStyles[task.priority]}`}
+                className={`rounded-full px-2.5 py-1 text-xs font-bold ${taskPriorityStyles[task.priority]}`}
               >
-                {label(task.priority)}
+                {taskPriorityLabels[task.priority]}
               </span>
             </div>
             <div className="border-border mt-4 border-t pt-3">

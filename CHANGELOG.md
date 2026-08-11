@@ -6,6 +6,10 @@
 
 - Corrected optimistic task totals across cached filters and pages, retained deletion context on recoverable failures, sanitized URL filters independently, and refreshed date-sensitive dashboard state after midnight or window focus
 
+### Changed
+
+- Scoped task-query providers and dialogs to the dashboard, narrowed session proxy coverage, reused authenticated Supabase request clients, and consolidated dashboard metrics into one RLS-protected aggregate function
+
 ## 0.1.0 - 2026-08-11
 
 ### Added

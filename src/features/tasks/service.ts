@@ -14,7 +14,10 @@ import type {
   Task,
   UpdateTaskInput,
 } from "@/features/tasks/types";
-import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database.generated";
+
+type Client = SupabaseClient<Database>;
 
 function toTask(row: TaskRow): Task {
   return {
@@ -30,8 +33,11 @@ function toTask(row: TaskRow): Task {
   };
 }
 
-export async function listTasks(userId: string, query: TaskListQuery) {
-  const client = await createClient();
+export async function listTasks(
+  client: Client,
+  userId: string,
+  query: TaskListQuery,
+) {
   const { rows, total } = await listTaskRows(client, userId, query);
   return {
     tasks: rows.map(toTask),
@@ -44,26 +50,31 @@ export async function listTasks(userId: string, query: TaskListQuery) {
   };
 }
 
-export async function createTask(userId: string, input: CreateTaskInput) {
-  const client = await createClient();
+export async function createTask(
+  client: Client,
+  userId: string,
+  input: CreateTaskInput,
+) {
   return toTask(await createTaskRow(client, userId, input));
 }
 
 export async function updateTask(
+  client: Client,
   userId: string,
   taskId: string,
   input: UpdateTaskInput,
 ) {
-  const client = await createClient();
   return toTask(await updateTaskRow(client, userId, taskId, input));
 }
 
-export async function deleteTask(userId: string, taskId: string) {
-  const client = await createClient();
+export async function deleteTask(
+  client: Client,
+  userId: string,
+  taskId: string,
+) {
   await deleteTaskRow(client, userId, taskId);
 }
 
-export async function getTaskMetrics(userId: string, today: string) {
-  const client = await createClient();
-  return getTaskMetricCounts(client, userId, today);
+export async function getTaskMetrics(client: Client, today: string) {
+  return getTaskMetricCounts(client, today);
 }

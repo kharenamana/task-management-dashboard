@@ -1,5 +1,4 @@
 const serviceMocks = vi.hoisted(() => ({
-  createClient: vi.fn(),
   listTaskRows: vi.fn(),
   createTaskRow: vi.fn(),
   updateTaskRow: vi.fn(),
@@ -8,9 +7,6 @@ const serviceMocks = vi.hoisted(() => ({
 }));
 
 vi.mock("server-only", () => ({}));
-vi.mock("@/lib/supabase/server", () => ({
-  createClient: serviceMocks.createClient,
-}));
 vi.mock("@/features/tasks/repository", () => ({
   listTaskRows: serviceMocks.listTaskRows,
   createTaskRow: serviceMocks.createTaskRow,
@@ -20,6 +16,8 @@ vi.mock("@/features/tasks/repository", () => ({
 }));
 
 import { taskNotFoundError } from "@/features/tasks/errors";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database.generated";
 import {
   createTask,
   deleteTask,
@@ -40,11 +38,11 @@ const row = {
   created_at: "2026-08-11T10:00:00.000Z",
   updated_at: "2026-08-11T10:00:00.000Z",
 };
+const client = { client: true } as unknown as SupabaseClient<Database>;
 
 describe("task service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    serviceMocks.createClient.mockResolvedValue({ client: true });
   });
 
   it("maps private database rows to paginated public tasks", async () => {
@@ -55,7 +53,7 @@ describe("task service", () => {
       pageSize: 20,
     };
 
-    const result = await listTasks(row.user_id, query);
+    const result = await listTasks(client, row.user_id, query);
 
     expect(result.tasks[0]).toEqual({
       id: row.id,
@@ -89,7 +87,7 @@ describe("task service", () => {
     });
 
     await expect(
-      createTask(row.user_id, {
+      createTask(client, row.user_id, {
         title: row.title,
         description: row.description,
         status: "completed",
@@ -101,14 +99,14 @@ describe("task service", () => {
       completedAt: expect.any(String),
     });
     await expect(
-      updateTask(row.user_id, row.id, { dueDate: "2026-08-20" }),
+      updateTask(client, row.user_id, row.id, { dueDate: "2026-08-20" }),
     ).resolves.toMatchObject({ dueDate: "2026-08-20" });
   });
 
   it("preserves ownership-safe not-found failures", async () => {
     serviceMocks.updateTaskRow.mockRejectedValue(taskNotFoundError());
     await expect(
-      updateTask(row.user_id, row.id, { status: "completed" }),
+      updateTask(client, row.user_id, row.id, { status: "completed" }),
     ).rejects.toMatchObject({ code: "TASK_NOT_FOUND", status: 404 });
   });
 
@@ -121,8 +119,8 @@ describe("task service", () => {
       overdue: 2,
     });
 
-    await deleteTask(row.user_id, row.id);
-    await expect(getTaskMetrics(row.user_id, "2026-08-11")).resolves.toEqual({
+    await deleteTask(client, row.user_id, row.id);
+    await expect(getTaskMetrics(client, "2026-08-11")).resolves.toEqual({
       total: 8,
       completed: 3,
       pending: 5,
@@ -132,6 +130,10 @@ describe("task service", () => {
       expect.anything(),
       row.user_id,
       row.id,
+    );
+    expect(serviceMocks.getTaskMetricCounts).toHaveBeenCalledWith(
+      client,
+      "2026-08-11",
     );
   });
 });

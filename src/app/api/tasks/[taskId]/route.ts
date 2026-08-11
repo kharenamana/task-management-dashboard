@@ -36,7 +36,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
   try {
     return successResponse(
-      await updateTask(auth.userId, taskId.data, parsed.data),
+      await updateTask(auth.client, auth.userId, taskId.data, parsed.data),
     );
   } catch (error) {
     return taskErrorResponse(error);
@@ -52,7 +52,7 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
     return taskErrorResponse(validationTaskError(taskId.error));
 
   try {
-    await deleteTask(auth.userId, taskId.data);
+    await deleteTask(auth.client, auth.userId, taskId.data);
     return successResponse(null);
   } catch (error) {
     return taskErrorResponse(error);

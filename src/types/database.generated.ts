@@ -77,7 +77,15 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      get_task_metrics: {
+        Args: { p_today: string };
+        Returns: {
+          completed: number;
+          overdue: number;
+          pending: number;
+          total: number;
+        }[];
+      };
     };
     Enums: {
       task_priority: "low" | "medium" | "high";

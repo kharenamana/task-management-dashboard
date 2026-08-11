@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 import type { Metadata } from "next";
 
-import { requirePageUser } from "@/features/auth/session";
+import { requirePageContext } from "@/features/auth/session";
 import { DashboardClient } from "@/features/tasks/components/dashboard-client";
 import { taskQueryFromRecord } from "@/features/tasks/filters";
 import { taskKeys } from "@/features/tasks/query-keys";
@@ -21,13 +21,13 @@ export default async function DashboardPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const user = await requirePageUser();
+  const { client, user } = await requirePageContext();
   const query = taskQueryFromRecord(await searchParams);
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({
     queryKey: taskKeys.list(query),
     queryFn: async () => {
-      const result = await listTasks(user.id, query);
+      const result = await listTasks(client, user.id, query);
       return { data: result.tasks, meta: result.meta };
     },
   });

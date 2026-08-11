@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     return taskErrorResponse(validationTaskError(query.error));
 
   try {
-    const result = await listTasks(auth.userId, query.data);
+    const result = await listTasks(auth.client, auth.userId, query.data);
     return successResponse(result.tasks, { meta: result.meta });
   } catch (error) {
     return taskErrorResponse(error);
@@ -45,9 +45,10 @@ export async function POST(request: NextRequest) {
     return taskErrorResponse(validationTaskError(parsed.error));
 
   try {
-    return successResponse(await createTask(auth.userId, parsed.data), {
-      status: 201,
-    });
+    return successResponse(
+      await createTask(auth.client, auth.userId, parsed.data),
+      { status: 201 },
+    );
   } catch (error) {
     return taskErrorResponse(error);
   }

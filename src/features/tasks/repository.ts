@@ -12,10 +12,13 @@ import type {
   TablesUpdate,
 } from "@/types/database.generated";
 
-export type TaskRow = Tables<"tasks">;
+export type TaskRow = Omit<Tables<"tasks">, "user_id">;
 type TaskInsert = TablesInsert<"tasks">;
 type TaskUpdate = TablesUpdate<"tasks">;
 type Client = SupabaseClient<Database>;
+
+const taskColumns =
+  "id,title,description,status,priority,due_date,completed_at,created_at,updated_at";
 
 function escapeLikePattern(value: string) {
   return value.replace(/[\\%_]/gu, "\\$&");
@@ -30,7 +33,7 @@ export async function listTaskRows(
   const to = from + query.pageSize - 1;
   let request = client
     .from("tasks")
-    .select("*", { count: "exact" })
+    .select(taskColumns, { count: "exact" })
     .eq("user_id", userId);
 
   if (query.q)
@@ -66,7 +69,7 @@ export async function createTaskRow(
   const { data, error } = await client
     .from("tasks")
     .insert(insert)
-    .select("*")
+    .select(taskColumns)
     .single();
   if (error || !data) throw taskDataError();
   return data;
@@ -92,7 +95,7 @@ export async function updateTaskRow(
     .update(update)
     .eq("id", taskId)
     .eq("user_id", userId)
-    .select("*")
+    .select(taskColumns)
     .maybeSingle();
   if (error) throw taskDataError();
   if (!data) throw taskNotFoundError();
@@ -115,38 +118,10 @@ export async function deleteTaskRow(
   if (!data) throw taskNotFoundError();
 }
 
-export async function getTaskMetricCounts(
-  client: Client,
-  userId: string,
-  today: string,
-) {
-  const results = await Promise.all([
-    client
-      .from("tasks")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId),
-    client
-      .from("tasks")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .eq("status", "completed"),
-    client
-      .from("tasks")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .neq("status", "completed"),
-    client
-      .from("tasks")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .neq("status", "completed")
-      .lt("due_date", today),
-  ]);
-  if (results.some((result) => result.error)) throw taskDataError();
-  return {
-    total: results[0].count ?? 0,
-    completed: results[1].count ?? 0,
-    pending: results[2].count ?? 0,
-    overdue: results[3].count ?? 0,
-  };
+export async function getTaskMetricCounts(client: Client, today: string) {
+  const { data, error } = await client
+    .rpc("get_task_metrics", { p_today: today })
+    .single();
+  if (error || !data) throw taskDataError();
+  return data;
 }

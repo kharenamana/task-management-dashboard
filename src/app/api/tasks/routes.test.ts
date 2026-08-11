@@ -27,6 +27,7 @@ import { GET, POST } from "@/app/api/tasks/route";
 import { taskNotFoundError } from "@/features/tasks/errors";
 
 const userId = "6c56c766-b8aa-4c71-8183-80fdf1f0e169";
+const client = { authenticated: true };
 const taskId = "a4e8e21c-2501-4af3-a5a4-c934bcb3ee89";
 const task = {
   id: taskId,
@@ -43,7 +44,7 @@ const task = {
 describe("task route handlers", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    routeMocks.requireApiUser.mockResolvedValue({ ok: true, userId });
+    routeMocks.requireApiUser.mockResolvedValue({ ok: true, userId, client });
   });
 
   it("returns 401 before parsing task input when authentication is absent", async () => {
@@ -79,7 +80,7 @@ describe("task route handlers", () => {
 
     expect(response.status).toBe(200);
     expect(body.meta.total).toBe(11);
-    expect(routeMocks.listTasks).toHaveBeenCalledWith(userId, {
+    expect(routeMocks.listTasks).toHaveBeenCalledWith(client, userId, {
       q: "ship",
       status: "pending",
       priority: "medium",
@@ -113,7 +114,7 @@ describe("task route handlers", () => {
     );
 
     expect(response.status).toBe(201);
-    expect(routeMocks.createTask).toHaveBeenCalledWith(userId, {
+    expect(routeMocks.createTask).toHaveBeenCalledWith(client, userId, {
       title: "Ship dashboard",
       description: "",
       status: "pending",

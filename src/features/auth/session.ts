@@ -1,6 +1,7 @@
 import "server-only";
 
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 import { userClaimsSchema } from "@/features/auth/schemas";
 import { createClient } from "@/lib/supabase/server";
@@ -10,7 +11,7 @@ export type AuthenticatedUser = {
   email: string | null;
 };
 
-export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
+export async function getAuthenticatedContext() {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
 
@@ -20,13 +21,26 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
   if (!claims.success) return null;
 
   return {
-    id: claims.data.sub,
-    email: claims.data.email ?? null,
+    client: supabase,
+    user: {
+      id: claims.data.sub,
+      email: claims.data.email ?? null,
+    } satisfies AuthenticatedUser,
   };
 }
 
+const getCachedPageContext = cache(getAuthenticatedContext);
+
+export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
+  return (await getAuthenticatedContext())?.user ?? null;
+}
+
+export async function requirePageContext(nextPath = "/dashboard") {
+  const context = await getCachedPageContext();
+  if (!context) redirect(`/login?next=${encodeURIComponent(nextPath)}`);
+  return context;
+}
+
 export async function requirePageUser(nextPath = "/dashboard") {
-  const user = await getAuthenticatedUser();
-  if (!user) redirect(`/login?next=${encodeURIComponent(nextPath)}`);
-  return user;
+  return (await requirePageContext(nextPath)).user;
 }

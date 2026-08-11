@@ -2,15 +2,22 @@ import "server-only";
 
 import { NextResponse } from "next/server";
 
-import { getAuthenticatedUser } from "@/features/auth/session";
+import { getAuthenticatedContext } from "@/features/auth/session";
 
 export type ApiAuthResult =
-  { ok: true; userId: string } | { ok: false; response: NextResponse };
+  | {
+      ok: true;
+      userId: string;
+      client: NonNullable<
+        Awaited<ReturnType<typeof getAuthenticatedContext>>
+      >["client"];
+    }
+  | { ok: false; response: NextResponse };
 
 export async function requireApiUser(): Promise<ApiAuthResult> {
-  const user = await getAuthenticatedUser();
+  const context = await getAuthenticatedContext();
 
-  if (!user) {
+  if (!context) {
     return {
       ok: false,
       response: NextResponse.json(
@@ -28,5 +35,9 @@ export async function requireApiUser(): Promise<ApiAuthResult> {
     };
   }
 
-  return { ok: true, userId: user.id };
+  return {
+    ok: true,
+    userId: context.user.id,
+    client: context.client,
+  };
 }

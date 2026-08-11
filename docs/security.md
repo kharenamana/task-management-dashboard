@@ -33,7 +33,7 @@ Keep the production callback exact. The preview wildcard is a beta convenience a
 
 ## Verification
 
-`supabase/tests/rls_ownership.sql` performs a transactional five-assertion, two-user test. User A cannot select, update, delete, or insert for user B, while an owned mutation succeeds. The corrected script passed against the hosted project on 2026-08-11 and rolled back all temporary data. Supabase's security advisor reported no findings on that date.
+`supabase/tests/rls_ownership.sql` performs a transactional six-assertion, two-user test. User A cannot select, update, delete, insert for, or count user B's tasks, while an owned mutation succeeds. The script passed against the hosted project on 2026-08-11 and rolled back all temporary data. The current security advisor reports no database-function or RLS issue; Supabase Auth's optional leaked-password protection remains disabled and should be enabled before a broader public launch.
 
 ## Known beta limitations
 

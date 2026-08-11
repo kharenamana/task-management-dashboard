@@ -15,6 +15,8 @@ TaskFlow uses Supabase Postgres 17. The committed migration is the source of tru
 
 Title and description lengths are enforced in Postgres in addition to application Zod validation. Composite indexes support common owner/status/priority/due-date access paths. A follow-up migration aligns the raw-title trigram GIN index with the API's case-insensitive `ILIKE` search expression.
 
+Dashboard totals are returned by `public.get_task_metrics(date)` in one aggregate query. The function is `SECURITY INVOKER`, has an empty search path, filters by `auth.uid()`, revokes `PUBLIC` and `anon` execution, and grants execution only to `authenticated`; table RLS therefore remains authoritative.
+
 ## Access model
 
 Only `authenticated` users receive task CRUD privileges. RLS then restricts every task operation to `user_id = auth.uid()`. Profiles can only be selected or updated by their owner; direct profile insert/delete is not granted. Anonymous users receive no table privileges.
@@ -43,9 +45,9 @@ Run the transactional RLS check against a local database:
 pnpm supabase:test-rls
 ```
 
-The script creates two temporary users, impersonates user A through JWT claims, verifies that user B's task is invisible and cannot be updated, deleted, or targeted by insert, verifies owned update succeeds, and rolls everything back.
+The script creates two temporary users, impersonates user A through JWT claims, verifies that user B's task is invisible and cannot be updated, deleted, targeted by insert, or counted by the metrics function, verifies owned update succeeds, and rolls everything back.
 
-For the hosted project, the same SQL can be run through the authenticated Supabase management connection. The five assertions passed transactionally on 2026-08-11 after replacing invalid nested data-modifying CTEs with top-level mutations and post-condition checks. Never run it through a client-visible key.
+For the hosted project, the same SQL can be run through the authenticated Supabase management connection. The six ownership and metrics-isolation assertions passed transactionally on 2026-08-11. Never run them through a client-visible key.
 
 The hosted Supabase security advisor reported no findings on 2026-08-11. The performance advisor reported only unused-index informational notices, which are expected before meaningful beta traffic; retain the ownership/filter/due-date/search indexes and reassess them using production query statistics.
 

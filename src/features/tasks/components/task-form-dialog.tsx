@@ -15,6 +15,10 @@ import {
   useCreateTask,
   useUpdateTask,
 } from "@/features/tasks/hooks/use-task-mutations";
+import {
+  taskPriorityOptions,
+  taskStatusOptions,
+} from "@/features/tasks/presentation";
 import { createTaskSchema } from "@/features/tasks/schemas";
 import type { CreateTaskInput, Task } from "@/features/tasks/types";
 
@@ -162,9 +166,11 @@ export function TaskFormDialog({
                   className={inputClassName}
                   {...register("status")}
                 >
-                  <option value="pending">Pending</option>
-                  <option value="in_progress">In progress</option>
-                  <option value="completed">Completed</option>
+                  {taskStatusOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>
@@ -176,9 +182,11 @@ export function TaskFormDialog({
                   className={inputClassName}
                   {...register("priority")}
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
+                  {taskPriorityOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

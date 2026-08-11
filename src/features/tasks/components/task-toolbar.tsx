@@ -1,5 +1,9 @@
 import { Plus, Search, SlidersHorizontal, X } from "lucide-react";
 
+import {
+  taskPriorityOptions,
+  taskStatusOptions,
+} from "@/features/tasks/presentation";
 import type { TaskListQuery } from "@/features/tasks/schemas";
 
 type TaskToolbarProps = {
@@ -59,9 +63,11 @@ export function TaskToolbar({
             className={selectClassName}
           >
             <option value="">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="in_progress">In progress</option>
-            <option value="completed">Completed</option>
+            {taskStatusOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
           <label className="sr-only" htmlFor="priority-filter">
             Filter by priority
@@ -73,9 +79,11 @@ export function TaskToolbar({
             className={selectClassName}
           >
             <option value="">All priorities</option>
-            <option value="low">Low priority</option>
-            <option value="medium">Medium priority</option>
-            <option value="high">High priority</option>
+            {taskPriorityOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label} priority
+              </option>
+            ))}
           </select>
           <label className="sr-only" htmlFor="due-sort">
             Sort by due date

@@ -10,13 +10,13 @@ TaskFlow is a server-first Next.js application for isolated, authenticated user 
 - `src/features`: domain-specific schemas, data access, hooks, and UI for authentication and tasks.
 - `src/components`: reusable presentation primitives without domain knowledge.
 - `src/lib`: infrastructure such as environment validation, Supabase clients, and shared API utilities.
-- `src/providers`: the small client-provider boundary for TanStack Query, theme, and notifications.
+- `src/providers`: route-scoped theme, TanStack Query, diagnostics, and notification boundaries.
 - `src/types`: generated database types and shared public contracts.
 - `supabase`: declarative migrations, local seed data, and database policy checks.
 
 ## Rendering and data flow
 
-Server Components are the default. The authenticated dashboard layout verifies the session on the server. The URL-selected initial task query is dehydrated into TanStack Query; metrics are fetched client-side with the user's local calendar date so overdue boundaries remain correct. Interactive client components own filters, forms, and mutations. Client requests use same-origin Route Handlers, which validate input and execute through an SSR Supabase client carrying the user's cookie session. PostgreSQL RLS is the final authorization boundary.
+Server Components are the default. The authenticated dashboard layout verifies the session on the server and shares a request-cached auth context with the page. The URL-selected initial task query is dehydrated into TanStack Query; metrics are fetched client-side with the user's local calendar date so overdue boundaries remain correct. Interactive client components own filters, forms, and mutations. Client requests use same-origin Route Handlers, which validate input and pass one authenticated SSR Supabase client through the service and repository layers. PostgreSQL RLS is the final authorization boundary.
 
 ```mermaid
 flowchart LR
@@ -31,7 +31,7 @@ Authentication uses separate browser, server, and proxy Supabase clients. The ro
 
 The task feature separates public schemas/contracts, a server-only service, and a server-only Supabase repository. Route Handlers authenticate before parsing bodies, validate URL/body input, and return normalized responses. Repository operations include explicit `user_id` predicates in addition to RLS. Public task objects omit ownership identifiers and map database snake-case fields to camel case.
 
-The dashboard Server Component authenticates and hydrates the URL-selected task query. Client components use TanStack Query for background refresh, metrics, and mutations. Completion and deletion update matching list caches optimistically with rollback; authoritative lists and metrics are revalidated afterward. Search, filters, sorting, and pagination live in the URL, while only temporary dialog/form state remains local.
+The dashboard Server Component authenticates and hydrates the URL-selected task query. Dashboard-only providers keep TanStack Query, notifications, and diagnostics out of public route bundles; heavy task dialogs load on demand. Client components use TanStack Query for background refresh, metrics, and mutations. Completion and deletion update matching list caches optimistically with rollback; authoritative lists and the single-query metrics RPC are revalidated afterward. Search, filters, sorting, and pagination live in the URL, while only temporary dialog/form state remains local.
 
 ## Repository map
 

@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     return taskErrorResponse(validationTaskError(query.error));
 
   try {
-    return successResponse(await getTaskMetrics(auth.userId, query.data.today));
+    return successResponse(await getTaskMetrics(auth.client, query.data.today));
   } catch (error) {
     return taskErrorResponse(error);
   }
