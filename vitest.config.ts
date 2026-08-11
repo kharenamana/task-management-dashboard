@@ -4,6 +4,9 @@ import { defineConfig } from "vitest/config";
 const sourceDirectory = fileURLToPath(
   new URL("./src", import.meta.url),
 ).replaceAll("\\", "/");
+const serverOnlyStub = fileURLToPath(
+  new URL("./src/test/server-only.ts", import.meta.url),
+).replaceAll("\\", "/");
 
 export default defineConfig({
   test: {
@@ -22,6 +25,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": sourceDirectory,
+      "server-only": serverOnlyStub,
     },
   },
 });
