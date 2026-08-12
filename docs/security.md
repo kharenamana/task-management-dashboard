@@ -23,10 +23,11 @@ TaskFlow uses defense in depth. Authentication, server authorization, HTTP valid
 
 ## Hosted authentication configuration
 
-The production Supabase Auth Site URL is `https://task-management-dashboard-tau-fawn.vercel.app`. The allowlist contains:
+The production Supabase Auth Site URL is `https://taskflow-management-dashboard.app`. The allowlist contains:
 
 - `http://localhost:3000/**`
-- `https://task-management-dashboard-tau-fawn.vercel.app/auth/callback`
+- `https://taskflow-management-dashboard.app/auth/callback`
+- `https://taskflow-management-dashboard.app/**`
 - `https://*-namanas-projects.vercel.app/**` for Git-linked preview deployments
 
 Keep the production callback exact. The preview wildcard is a beta convenience and should be narrowed or protected when untrusted contributors can create previews.

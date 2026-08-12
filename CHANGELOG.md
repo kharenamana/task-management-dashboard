@@ -44,4 +44,4 @@
 
 - Vercel-ready configuration and Git-linked preview workflow
 - Production Supabase Auth URLs and Vercel environment names documented
-- Canonical production deployment at `task-management-dashboard-tau-fawn.vercel.app`
+- Canonical production deployment at `taskflow-management-dashboard.app`

@@ -1,6 +1,6 @@
 # Deployment
 
-TaskFlow is deployed through the Vercel Git integration. The canonical production URL is [task-management-dashboard-tau-fawn.vercel.app](https://task-management-dashboard-tau-fawn.vercel.app).
+TaskFlow is deployed through the Vercel Git integration. The canonical production URL is [taskflow-management-dashboard.app](https://taskflow-management-dashboard.app).
 
 ## Environment variables
 
@@ -10,7 +10,7 @@ Configure these names in Vercel for Production, Preview, and Development. Values
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `NEXT_PUBLIC_SITE_URL`
 
-Production `NEXT_PUBLIC_SITE_URL` is `https://task-management-dashboard-tau-fawn.vercel.app` without a trailing slash. Preview deployments currently use the canonical production site URL for metadata and safe auth redirects; change this only with a reviewed per-environment redirect strategy.
+Production and Preview `NEXT_PUBLIC_SITE_URL` are `https://taskflow-management-dashboard.app` without a trailing slash. Preview deployments intentionally use the canonical production site URL for metadata and safe auth redirects.
 
 Test credentials are separate GitHub Actions repository secrets:
 
@@ -26,7 +26,8 @@ Set the hosted Auth Site URL to the canonical production origin and allow:
 
 ```text
 http://localhost:3000/**
-https://task-management-dashboard-tau-fawn.vercel.app/auth/callback
+https://taskflow-management-dashboard.app/auth/callback
+https://taskflow-management-dashboard.app/**
 https://*-namanas-projects.vercel.app/**
 ```
 

@@ -2,7 +2,7 @@
 
 TaskFlow is a secure, multi-user task dashboard built as a production-minded private beta with Next.js 16, React 19, strict TypeScript, Tailwind CSS, Supabase, and TanStack Query.
 
-**Live demo:** [task-management-dashboard-tau-fawn.vercel.app](https://task-management-dashboard-tau-fawn.vercel.app)
+**Live demo:** [taskflow-management-dashboard.app](https://taskflow-management-dashboard.app)
 
 ## What is included
 
