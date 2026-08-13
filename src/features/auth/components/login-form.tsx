@@ -11,6 +11,7 @@ import {
   FieldError,
   FormStatus,
   inputClassName,
+  PasswordInput,
   SubmitButton,
 } from "@/features/auth/components/form-controls";
 import { loginSchema, type LoginInput } from "@/features/auth/schemas";
@@ -82,13 +83,12 @@ export function LoginForm({
             Forgot password?
           </Link>
         </div>
-        <input
+        <PasswordInput
           id="password"
-          type="password"
+          visibilityLabel="password"
           autoComplete="current-password"
           aria-invalid={Boolean(errors.password)}
           aria-describedby={errors.password ? "password-error" : undefined}
-          className={inputClassName}
           {...register("password")}
         />
         <FieldError id="password-error" message={errors.password?.message} />

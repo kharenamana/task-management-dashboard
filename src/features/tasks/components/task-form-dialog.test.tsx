@@ -12,6 +12,19 @@ vi.mock("@/features/tasks/hooks/use-task-mutations", () => ({
 }));
 
 import { TaskFormDialog } from "@/features/tasks/components/task-form-dialog";
+import type { Task } from "@/features/tasks/types";
+
+const task: Task = {
+  id: "a4e8e21c-2501-4af3-a5a4-c934bcb3ee89",
+  title: "Ship dashboard",
+  description: "Review the release candidate.",
+  status: "in_progress",
+  priority: "high",
+  dueDate: "2026-08-20",
+  completedAt: null,
+  createdAt: "2026-08-01T10:00:00.000Z",
+  updatedAt: "2026-08-01T10:00:00.000Z",
+};
 
 describe("TaskFormDialog", () => {
   beforeEach(() => vi.clearAllMocks());
@@ -37,6 +50,19 @@ describe("TaskFormDialog", () => {
       dueDate: null,
     });
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("renders the shared mobile-safe structure in edit mode", () => {
+    render(<TaskFormDialog open onOpenChange={vi.fn()} task={task} />);
+
+    const dialog = screen.getByRole("dialog", { name: "Edit task" });
+    expect(dialog).toHaveClass("task-dialog-content", "overflow-hidden");
+    expect(dialog.className).toContain("100dvh");
+    expect(screen.getByTestId("task-dialog-scroll-region")).toHaveClass(
+      "overflow-y-auto",
+    );
+    expect(screen.getByRole("button", { name: "Save changes" })).toBeVisible();
+    expect(screen.getByLabelText("Title")).toHaveValue("Ship dashboard");
   });
 
   it("reports description length and warns before discarding dirty input", async () => {

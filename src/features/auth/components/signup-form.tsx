@@ -11,6 +11,7 @@ import {
   FieldError,
   FormStatus,
   inputClassName,
+  PasswordInput,
   SubmitButton,
 } from "@/features/auth/components/form-controls";
 import { signupSchema, type SignupInput } from "@/features/auth/schemas";
@@ -85,11 +86,10 @@ export function SignupForm() {
         <label htmlFor="password" className="text-sm font-bold">
           Password
         </label>
-        <input
+        <PasswordInput
           id="password"
-          type="password"
+          visibilityLabel="password"
           autoComplete="new-password"
-          className={inputClassName}
           aria-invalid={Boolean(errors.password)}
           aria-describedby={
             errors.password ? "password-error" : "password-hint"
@@ -105,11 +105,10 @@ export function SignupForm() {
         <label htmlFor="confirmPassword" className="text-sm font-bold">
           Confirm password
         </label>
-        <input
+        <PasswordInput
           id="confirmPassword"
-          type="password"
+          visibilityLabel="password confirmation"
           autoComplete="new-password"
-          className={inputClassName}
           aria-invalid={Boolean(errors.confirmPassword)}
           aria-describedby={
             errors.confirmPassword ? "confirmPassword-error" : undefined

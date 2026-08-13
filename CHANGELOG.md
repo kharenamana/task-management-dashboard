@@ -8,6 +8,8 @@
 
 ### Changed
 
+- Centered the shared create/edit task dialog independently of motion, with a mobile-safe viewport shell, scrollable body, and always-reachable actions
+- Added accessible, independently controlled password visibility buttons to sign-in, sign-up, and password-reset forms
 - Moved the canonical production origin to the Vercel-managed `taskflow-management-dashboard.vercel.app` hostname to remove the external DNS dependency
 - Scoped task-query providers and dialogs to the dashboard, narrowed session proxy coverage, reused authenticated Supabase request clients, and consolidated dashboard metrics into one RLS-protected aggregate function
 - Refined dashboard hierarchy with search-first controls, removable filter chips, neutral metrics, larger action targets, focused pagination, and protected dirty forms

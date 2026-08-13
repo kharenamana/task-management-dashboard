@@ -10,7 +10,7 @@ import { resetPasswordAction } from "@/features/auth/actions";
 import {
   FieldError,
   FormStatus,
-  inputClassName,
+  PasswordInput,
   SubmitButton,
 } from "@/features/auth/components/form-controls";
 import {
@@ -53,11 +53,10 @@ export function ResetPasswordForm() {
         <label htmlFor="password" className="text-sm font-bold">
           New password
         </label>
-        <input
+        <PasswordInput
           id="password"
-          type="password"
+          visibilityLabel="new password"
           autoComplete="new-password"
-          className={inputClassName}
           aria-invalid={Boolean(errors.password)}
           aria-describedby={
             errors.password ? "password-error" : "password-hint"
@@ -73,11 +72,10 @@ export function ResetPasswordForm() {
         <label htmlFor="confirmPassword" className="text-sm font-bold">
           Confirm new password
         </label>
-        <input
+        <PasswordInput
           id="confirmPassword"
-          type="password"
+          visibilityLabel="new password confirmation"
           autoComplete="new-password"
-          className={inputClassName}
           aria-invalid={Boolean(errors.confirmPassword)}
           aria-describedby={
             errors.confirmPassword ? "confirmPassword-error" : undefined

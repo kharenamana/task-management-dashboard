@@ -41,6 +41,22 @@ describe("LoginForm", () => {
     expect(loginAction).not.toHaveBeenCalled();
   });
 
+  it("shows and hides the password without changing its value", async () => {
+    const user = userEvent.setup();
+    render(<LoginForm />);
+    const password = screen.getByLabelText("Password");
+
+    await user.type(password, "Secure123");
+    expect(password).toHaveAttribute("type", "password");
+
+    await user.click(screen.getByRole("button", { name: "Show password" }));
+    expect(password).toHaveAttribute("type", "text");
+    expect(password).toHaveValue("Secure123");
+    expect(
+      screen.getByRole("button", { name: "Hide password" }),
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("renders a sanitized server error without navigating", async () => {
     loginAction.mockResolvedValue({
       ok: false,

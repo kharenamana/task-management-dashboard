@@ -46,6 +46,21 @@ describe("authentication forms", () => {
     );
   });
 
+  it("controls signup password visibility independently", async () => {
+    const user = userEvent.setup();
+    render(<SignupForm />);
+    const password = screen.getByLabelText("Password");
+    const confirmation = screen.getByLabelText("Confirm password");
+
+    await user.click(screen.getByRole("button", { name: "Show password" }));
+
+    expect(password).toHaveAttribute("type", "text");
+    expect(confirmation).toHaveAttribute("type", "password");
+    expect(
+      screen.getByRole("button", { name: "Show password confirmation" }),
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+
   it("shows the generic forgot-password confirmation", async () => {
     formMocks.forgotPasswordAction.mockResolvedValue({
       ok: true,
@@ -90,5 +105,19 @@ describe("authentication forms", () => {
       "invalid or expired",
     );
     expect(formMocks.push).not.toHaveBeenCalled();
+  });
+
+  it("controls reset password fields independently", async () => {
+    const user = userEvent.setup();
+    render(<ResetPasswordForm />);
+    const password = screen.getByLabelText("New password");
+    const confirmation = screen.getByLabelText("Confirm new password");
+
+    await user.click(
+      screen.getByRole("button", { name: "Show new password confirmation" }),
+    );
+
+    expect(password).toHaveAttribute("type", "password");
+    expect(confirmation).toHaveAttribute("type", "text");
   });
 });

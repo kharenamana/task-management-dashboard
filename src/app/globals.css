@@ -337,6 +337,10 @@ body {
   animation: dialog-in 220ms ease-out both;
 }
 
+.task-dialog-content {
+  translate: -50% -50%;
+}
+
 .cta-panel {
   display: flex;
   flex-direction: column;
@@ -471,11 +475,11 @@ body {
 @keyframes dialog-in {
   from {
     opacity: 0;
-    transform: translate(-50%, -48%) scale(0.985);
+    scale: 0.985;
   }
   to {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    scale: 1;
   }
 }
 
