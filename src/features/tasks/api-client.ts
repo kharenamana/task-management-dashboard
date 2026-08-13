@@ -1,10 +1,14 @@
-import type { TaskListQuery } from "@/features/tasks/schemas";
+import type {
+  TaskListQuery,
+  TaskSuggestionQuery,
+} from "@/features/tasks/schemas";
 import type {
   ApiErrorBody,
   ApiSuccessBody,
   CreateTaskInput,
   Task,
   TaskMetrics,
+  TaskSuggestion,
   UpdateTaskInput,
 } from "@/features/tasks/types";
 
@@ -49,7 +53,7 @@ async function request<T>(url: string, init?: RequestInit) {
   return body;
 }
 
-export function getTasks(query: TaskListQuery) {
+export function getTasks(query: TaskListQuery, signal?: AbortSignal) {
   const parameters = new URLSearchParams({
     sort: query.sort,
     page: String(query.page),
@@ -58,7 +62,26 @@ export function getTasks(query: TaskListQuery) {
   if (query.q) parameters.set("q", query.q);
   if (query.status) parameters.set("status", query.status);
   if (query.priority) parameters.set("priority", query.priority);
-  return request<Task[]>(`/api/tasks?${parameters}`);
+  return request<Task[]>(
+    `/api/tasks?${parameters}`,
+    signal ? { signal } : undefined,
+  );
+}
+
+export function getTaskSuggestions(
+  query: TaskSuggestionQuery,
+  signal?: AbortSignal,
+) {
+  const parameters = new URLSearchParams({
+    q: query.q,
+    limit: String(query.limit),
+  });
+  if (query.status) parameters.set("status", query.status);
+  if (query.priority) parameters.set("priority", query.priority);
+  return request<TaskSuggestion[]>(
+    `/api/tasks/suggestions?${parameters}`,
+    signal ? { signal } : undefined,
+  );
 }
 
 export function postTask(input: CreateTaskInput) {

@@ -83,6 +83,17 @@ export const taskListQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
 });
 
+export const taskSuggestionQuerySchema = z.object({
+  q: z
+    .string()
+    .trim()
+    .min(2, "Enter at least 2 characters for suggestions.")
+    .max(100, "Keep search under 100 characters."),
+  status: optionalFilter(taskStatuses),
+  priority: optionalFilter(taskPriorities),
+  limit: z.coerce.number().int().min(1).max(6).default(6),
+});
+
 export const metricsQuerySchema = z.object({
   today: calendarDateSchema,
 });
@@ -90,3 +101,4 @@ export const metricsQuerySchema = z.object({
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 export type TaskListQuery = z.infer<typeof taskListQuerySchema>;
+export type TaskSuggestionQuery = z.infer<typeof taskSuggestionQuerySchema>;

@@ -5,13 +5,18 @@ import {
   deleteTaskRow,
   getTaskMetricCounts,
   listTaskRows,
+  listTaskTitleRows,
   type TaskRow,
   updateTaskRow,
 } from "@/features/tasks/repository";
-import type { TaskListQuery } from "@/features/tasks/schemas";
+import type {
+  TaskListQuery,
+  TaskSuggestionQuery,
+} from "@/features/tasks/schemas";
 import type {
   CreateTaskInput,
   Task,
+  TaskSuggestion,
   UpdateTaskInput,
 } from "@/features/tasks/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -48,6 +53,26 @@ export async function listTasks(
       totalPages: Math.ceil(total / query.pageSize),
     },
   };
+}
+
+export async function listTaskSuggestions(
+  client: Client,
+  userId: string,
+  query: TaskSuggestionQuery,
+) {
+  const rows = await listTaskTitleRows(client, userId, query);
+  const seen = new Set<string>();
+  const suggestions: TaskSuggestion[] = [];
+
+  for (const row of rows) {
+    const normalizedTitle = row.title.toLowerCase();
+    if (seen.has(normalizedTitle)) continue;
+    seen.add(normalizedTitle);
+    suggestions.push({ title: row.title });
+    if (suggestions.length === query.limit) break;
+  }
+
+  return suggestions;
 }
 
 export async function createTask(

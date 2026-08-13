@@ -1,10 +1,4 @@
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 const dashboardMocks = vi.hoisted(() => ({
@@ -49,6 +43,10 @@ vi.mock("@/features/tasks/hooks/use-task-mutations", () => ({
   useUpdateTask: () => ({ isPending: false, mutateAsync: vi.fn() }),
 }));
 
+vi.mock("@/features/tasks/hooks/use-task-suggestions", () => ({
+  useTaskSuggestions: () => ({ suggestions: [], state: "idle" }),
+}));
+
 import { DashboardClient } from "@/features/tasks/components/dashboard-client";
 import { defaultTaskQuery } from "@/features/tasks/filters";
 
@@ -67,17 +65,57 @@ describe("DashboardClient", () => {
 
   afterEach(() => vi.useRealTimers());
 
-  it("debounces title search and resets pagination in the URL", () => {
+  it("commits title search only after an explicit submit", async () => {
+    vi.useRealTimers();
+    const user = userEvent.setup();
     render(<DashboardClient initialQuery={defaultTaskQuery} />);
 
     fireEvent.change(screen.getByLabelText("Search tasks by title"), {
       target: { value: "ship" },
     });
-    act(() => vi.advanceTimersByTime(349));
     expect(dashboardMocks.replace).not.toHaveBeenCalled();
 
-    act(() => vi.advanceTimersByTime(1));
+    await user.click(screen.getByRole("button", { name: "Search" }));
     expect(dashboardMocks.replace).toHaveBeenCalledWith("/dashboard?q=ship", {
+      scroll: false,
+    });
+  });
+
+  it("commits a draft with Enter and clears search pagination explicitly", async () => {
+    vi.useRealTimers();
+    dashboardMocks.searchParams = new URLSearchParams("q=old&page=2");
+    dashboardMocks.meta = {
+      page: 2,
+      pageSize: 20,
+      total: 25,
+      totalPages: 2,
+    };
+    const user = userEvent.setup();
+    const { unmount } = render(
+      <DashboardClient
+        initialQuery={{ ...defaultTaskQuery, q: "old", page: 2 }}
+      />,
+    );
+    const search = screen.getByRole("combobox", {
+      name: "Search tasks by title",
+    });
+
+    await user.clear(search);
+    await user.type(search, "new search{Enter}");
+    expect(dashboardMocks.replace).toHaveBeenLastCalledWith(
+      "/dashboard?q=new+search",
+      { scroll: false },
+    );
+
+    unmount();
+    dashboardMocks.replace.mockClear();
+    render(
+      <DashboardClient
+        initialQuery={{ ...defaultTaskQuery, q: "old", page: 2 }}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Clear" }));
+    expect(dashboardMocks.replace).toHaveBeenCalledWith("/dashboard", {
       scroll: false,
     });
   });

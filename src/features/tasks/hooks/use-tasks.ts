@@ -9,7 +9,7 @@ import type { TaskListQuery } from "@/features/tasks/schemas";
 export function useTasks(query: TaskListQuery) {
   return useQuery({
     queryKey: taskKeys.list(query),
-    queryFn: () => getTasks(query),
+    queryFn: ({ signal }) => getTasks(query, signal),
   });
 }
 

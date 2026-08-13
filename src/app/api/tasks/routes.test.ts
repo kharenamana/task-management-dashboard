@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 const routeMocks = vi.hoisted(() => ({
   requireApiUser: vi.fn(),
   listTasks: vi.fn(),
+  listTaskSuggestions: vi.fn(),
   createTask: vi.fn(),
   updateTask: vi.fn(),
   deleteTask: vi.fn(),
@@ -15,6 +16,7 @@ vi.mock("@/features/auth/api", () => ({
 }));
 vi.mock("@/features/tasks/service", () => ({
   listTasks: routeMocks.listTasks,
+  listTaskSuggestions: routeMocks.listTaskSuggestions,
   createTask: routeMocks.createTask,
   updateTask: routeMocks.updateTask,
   deleteTask: routeMocks.deleteTask,
@@ -23,6 +25,7 @@ vi.mock("@/features/tasks/service", () => ({
 
 import { DELETE, PATCH } from "@/app/api/tasks/[taskId]/route";
 import { GET as GET_METRICS } from "@/app/api/tasks/metrics/route";
+import { GET as GET_SUGGESTIONS } from "@/app/api/tasks/suggestions/route";
 import { GET, POST } from "@/app/api/tasks/route";
 import { taskNotFoundError } from "@/features/tasks/errors";
 
@@ -88,6 +91,42 @@ describe("task route handlers", () => {
       page: 2,
       pageSize: 10,
     });
+  });
+
+  it("returns validated owner-scoped title suggestions without caching", async () => {
+    routeMocks.listTaskSuggestions.mockResolvedValue([
+      { title: "Ship dashboard" },
+    ]);
+    const response = await GET_SUGGESTIONS(
+      new NextRequest(
+        "http://localhost:3000/api/tasks/suggestions?q=ship&status=pending&priority=high&limit=4",
+      ),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(routeMocks.listTaskSuggestions).toHaveBeenCalledWith(
+      client,
+      userId,
+      {
+        q: "ship",
+        status: "pending",
+        priority: "high",
+        limit: 4,
+      },
+    );
+    await expect(response.json()).resolves.toEqual({
+      data: [{ title: "Ship dashboard" }],
+    });
+  });
+
+  it("rejects invalid suggestion queries before data access", async () => {
+    const response = await GET_SUGGESTIONS(
+      new NextRequest("http://localhost:3000/api/tasks/suggestions?q=s"),
+    );
+
+    expect(response.status).toBe(400);
+    expect(routeMocks.listTaskSuggestions).not.toHaveBeenCalled();
   });
 
   it("returns field-safe 400 responses for invalid create input", async () => {

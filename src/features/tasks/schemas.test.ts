@@ -2,6 +2,7 @@ import {
   createTaskSchema,
   metricsQuerySchema,
   taskListQuerySchema,
+  taskSuggestionQuerySchema,
   updateTaskSchema,
 } from "@/features/tasks/schemas";
 
@@ -69,5 +70,24 @@ describe("task schemas", () => {
     expect(taskListQuerySchema.safeParse({ q: "x".repeat(101) }).success).toBe(
       false,
     );
+  });
+
+  it("validates and bounds suggestion requests", () => {
+    expect(
+      taskSuggestionQuerySchema.parse({
+        q: "  ship  ",
+        status: "pending",
+        priority: "high",
+      }),
+    ).toEqual({
+      q: "ship",
+      status: "pending",
+      priority: "high",
+      limit: 6,
+    });
+    expect(taskSuggestionQuerySchema.safeParse({ q: "s" }).success).toBe(false);
+    expect(
+      taskSuggestionQuerySchema.safeParse({ q: "ship", limit: "7" }).success,
+    ).toBe(false);
   });
 });

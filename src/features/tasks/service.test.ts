@@ -1,5 +1,6 @@
 const serviceMocks = vi.hoisted(() => ({
   listTaskRows: vi.fn(),
+  listTaskTitleRows: vi.fn(),
   createTaskRow: vi.fn(),
   updateTaskRow: vi.fn(),
   deleteTaskRow: vi.fn(),
@@ -9,6 +10,7 @@ const serviceMocks = vi.hoisted(() => ({
 vi.mock("server-only", () => ({}));
 vi.mock("@/features/tasks/repository", () => ({
   listTaskRows: serviceMocks.listTaskRows,
+  listTaskTitleRows: serviceMocks.listTaskTitleRows,
   createTaskRow: serviceMocks.createTaskRow,
   updateTaskRow: serviceMocks.updateTaskRow,
   deleteTaskRow: serviceMocks.deleteTaskRow,
@@ -23,6 +25,7 @@ import {
   deleteTask,
   getTaskMetrics,
   listTasks,
+  listTaskSuggestions,
   updateTask,
 } from "@/features/tasks/service";
 
@@ -101,6 +104,32 @@ describe("task service", () => {
     await expect(
       updateTask(client, row.user_id, row.id, { dueDate: "2026-08-20" }),
     ).resolves.toMatchObject({ dueDate: "2026-08-20" });
+  });
+
+  it("deduplicates owner-scoped title suggestions case-insensitively", async () => {
+    serviceMocks.listTaskTitleRows.mockResolvedValue([
+      { title: "Review launch" },
+      { title: "review launch" },
+      { title: "Ship dashboard" },
+    ]);
+    const query = {
+      q: "sh",
+      status: "pending" as const,
+      priority: "high" as const,
+      limit: 2,
+    };
+
+    await expect(
+      listTaskSuggestions(client, row.user_id, query),
+    ).resolves.toEqual([
+      { title: "Review launch" },
+      { title: "Ship dashboard" },
+    ]);
+    expect(serviceMocks.listTaskTitleRows).toHaveBeenCalledWith(
+      client,
+      row.user_id,
+      query,
+    );
   });
 
   it("preserves ownership-safe not-found failures", async () => {

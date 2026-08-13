@@ -16,6 +16,7 @@
 
 ### Added
 
+- Added explicit task search submission, a focused Clear action, and an owner-scoped debounced title-suggestion API with accessible keyboard navigation
 - Added seven static public case-study routes with unique canonical, Open Graph, and Twitter metadata
 - Added sitemap, robots policy, web manifest, generated icons/social image, crawlable navigation, and content-matched structured data
 - Added named forms, consistent skip targets, semantic table/action labels, reduced-motion behavior, and focused axe Playwright checks

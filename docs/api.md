@@ -25,6 +25,10 @@ Query parameters:
 
 Creates an owned task. Body fields are `title`, `description`, `status`, `priority`, and nullable `dueDate`. The server supplies `user_id`; clients cannot choose task ownership.
 
+### `GET /api/tasks/suggestions`
+
+Returns up to six case-insensitively deduplicated title suggestions. `q` is required (2–100 characters); optional `status` and `priority` filters match the active dashboard controls, and `limit` is bounded to 1–6. The query selects only `title`, includes an explicit authenticated-owner predicate, remains protected by RLS, and is never shared by an HTTP cache.
+
 ### `PATCH /api/tasks/:taskId`
 
 Updates one or more task fields. Setting `status` to `completed` lets the database trigger set `completed_at`; moving away from completed clears it. Missing and non-owned IDs both return `404 TASK_NOT_FOUND`.

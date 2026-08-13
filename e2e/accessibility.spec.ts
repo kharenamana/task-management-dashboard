@@ -63,8 +63,13 @@ test("authenticated dashboard has no blocking axe findings", async ({
   );
 
   await page.goto("/login");
+  const passwordInput = page.getByLabel("Password", { exact: true });
+  await expect(passwordInput).toHaveAttribute("type", "password");
+  await page.getByRole("button", { name: "Show password" }).click();
+  await expect(passwordInput).toHaveAttribute("type", "text");
+  await page.getByRole("button", { name: "Hide password" }).click();
   await page.getByLabel("Email address").fill(email!);
-  await page.getByLabel("Password").fill(password!);
+  await passwordInput.fill(password!);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/dashboard(?:\?|$)/u);
   await expect(

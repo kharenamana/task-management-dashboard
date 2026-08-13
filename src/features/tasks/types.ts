@@ -33,6 +33,10 @@ export type TaskMetrics = {
   overdue: number;
 };
 
+export type TaskSuggestion = {
+  title: string;
+};
+
 export type PaginationMeta = {
   page: number;
   pageSize: number;

@@ -1,4 +1,9 @@
-import { Plus, Search, SlidersHorizontal, X } from "lucide-react";
+import { Plus, SlidersHorizontal, X } from "lucide-react";
+
+import {
+  TaskSearch,
+  type SuggestionState,
+} from "@/features/tasks/components/task-search";
 
 import {
   taskPriorityLabels,
@@ -8,11 +13,15 @@ import {
   taskStatusOptions,
 } from "@/features/tasks/presentation";
 import type { TaskListQuery } from "@/features/tasks/schemas";
+import type { TaskSuggestion } from "@/features/tasks/types";
 
 type TaskToolbarProps = {
   query: TaskListQuery;
   searchValue: string;
+  suggestions: TaskSuggestion[];
+  suggestionState: SuggestionState;
   onSearchChange: (value: string) => void;
+  onSearchSubmit: (value: string) => void;
   onSearchClear: () => void;
   onQueryChange: (key: "status" | "priority" | "sort", value: string) => void;
   onFilterRemove: (key: "status" | "priority" | "sort") => void;
@@ -26,7 +35,10 @@ const selectClassName =
 export function TaskToolbar({
   query,
   searchValue,
+  suggestions,
+  suggestionState,
   onSearchChange,
+  onSearchSubmit,
   onSearchClear,
   onQueryChange,
   onFilterRemove,
@@ -36,29 +48,22 @@ export function TaskToolbar({
   const filtered = Boolean(
     query.q || query.status || query.priority || query.sort !== "due_asc",
   );
+
   return (
     <section
       aria-label="Task controls"
       className="border-border bg-card rounded-2xl border p-3 shadow-sm sm:p-4"
     >
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-        <div className="relative min-w-0 flex-1 lg:max-w-2xl">
-          <Search
-            className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
-            aria-hidden="true"
-          />
-          <label htmlFor="task-search" className="sr-only">
-            Search tasks by title
-          </label>
-          <input
-            id="task-search"
-            type="search"
-            value={searchValue}
-            onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search tasks…"
-            className="border-border bg-background h-11 w-full rounded-xl border pr-3 pl-10 text-sm shadow-sm"
-          />
-        </div>
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start">
+        <TaskSearch
+          value={searchValue}
+          hasCommittedSearch={Boolean(query.q)}
+          suggestions={suggestions}
+          suggestionState={suggestionState}
+          onChange={onSearchChange}
+          onSubmit={onSearchSubmit}
+          onClear={onSearchClear}
+        />
         <button
           type="button"
           onClick={onCreate}
@@ -162,7 +167,7 @@ export function TaskToolbar({
         </div>
       ) : (
         <p className="text-muted-foreground mt-3 text-xs">
-          Search updates after a short pause.
+          Type two or more characters for suggestions, then submit to search.
         </p>
       )}
     </section>

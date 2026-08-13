@@ -1,13 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-} from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 
 import { taskQueryFromRecord } from "@/features/tasks/filters";
 import type { TaskListQuery } from "@/features/tasks/schemas";
@@ -43,19 +37,6 @@ export function useTaskFilters(initialQuery: TaskListQuery) {
     [pathname, router],
   );
 
-  useEffect(() => {
-    if (searchValue.trim() === currentSearch) return;
-    const timeout = window.setTimeout(() => {
-      const parameters = new URLSearchParams(searchKey);
-      const normalized = searchValue.trim();
-      if (normalized) parameters.set("q", normalized);
-      else parameters.delete("q");
-      parameters.delete("page");
-      replace(parameters);
-    }, 350);
-    return () => window.clearTimeout(timeout);
-  }, [currentSearch, replace, searchKey, searchValue]);
-
   const updateQuery = useCallback(
     (changes: Record<string, string | undefined>, resetPage = true) => {
       const parameters = new URLSearchParams(searchKey);
@@ -72,6 +53,20 @@ export function useTaskFilters(initialQuery: TaskListQuery) {
     [replace, searchKey],
   );
 
+  const submitSearch = useCallback(
+    (value: string) => {
+      const normalized = value.trim();
+      setSearchDraft({ source: currentSearch, value: normalized });
+      updateQuery({ q: normalized || undefined });
+    },
+    [currentSearch, updateQuery],
+  );
+
+  const clearSearch = useCallback(() => {
+    setSearchDraft({ source: currentSearch, value: "" });
+    updateQuery({ q: undefined });
+  }, [currentSearch, updateQuery]);
+
   const clear = useCallback(() => {
     setSearchDraft({ source: currentSearch, value: "" });
     replace(new URLSearchParams());
@@ -79,12 +74,14 @@ export function useTaskFilters(initialQuery: TaskListQuery) {
 
   return {
     clear,
+    clearSearch,
     isNavigating,
     query,
     searchKey,
     searchValue,
     setSearchValue: (value: string) =>
       setSearchDraft({ source: currentSearch, value }),
+    submitSearch,
     updateQuery,
   };
 }

@@ -3,7 +3,10 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { taskDataError, taskNotFoundError } from "@/features/tasks/errors";
-import type { TaskListQuery } from "@/features/tasks/schemas";
+import type {
+  TaskListQuery,
+  TaskSuggestionQuery,
+} from "@/features/tasks/schemas";
 import type { CreateTaskInput, UpdateTaskInput } from "@/features/tasks/types";
 import type {
   Database,
@@ -13,6 +16,7 @@ import type {
 } from "@/types/database.generated";
 
 export type TaskRow = Omit<Tables<"tasks">, "user_id">;
+export type TaskTitleRow = Pick<Tables<"tasks">, "title">;
 type TaskInsert = TablesInsert<"tasks">;
 type TaskUpdate = TablesUpdate<"tasks">;
 type Client = SupabaseClient<Database>;
@@ -51,6 +55,27 @@ export async function listTaskRows(
 
   if (error) throw taskDataError();
   return { rows: data, total: count ?? 0 };
+}
+
+export async function listTaskTitleRows(
+  client: Client,
+  userId: string,
+  query: TaskSuggestionQuery,
+) {
+  let request = client
+    .from("tasks")
+    .select("title")
+    .eq("user_id", userId)
+    .ilike("title", `%${escapeLikePattern(query.q)}%`);
+
+  if (query.status) request = request.eq("status", query.status);
+  if (query.priority) request = request.eq("priority", query.priority);
+
+  const { data, error } = await request
+    .order("title", { ascending: true })
+    .limit(query.limit * 3);
+  if (error) throw taskDataError();
+  return (data ?? []) satisfies TaskTitleRow[];
 }
 
 export async function createTaskRow(

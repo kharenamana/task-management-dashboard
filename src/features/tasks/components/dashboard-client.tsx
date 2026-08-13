@@ -15,6 +15,7 @@ import { TaskToolbar } from "@/features/tasks/components/task-toolbar";
 import { useLocalToday } from "@/features/tasks/hooks/use-local-today";
 import { useTaskFilters } from "@/features/tasks/hooks/use-task-filters";
 import { useToggleTask } from "@/features/tasks/hooks/use-task-mutations";
+import { useTaskSuggestions } from "@/features/tasks/hooks/use-task-suggestions";
 import { useTaskMetrics, useTasks } from "@/features/tasks/hooks/use-tasks";
 import type { TaskListQuery } from "@/features/tasks/schemas";
 import type { Task } from "@/features/tasks/types";
@@ -37,10 +38,12 @@ export function DashboardClient({
 }) {
   const {
     clear,
+    clearSearch,
     isNavigating,
     query,
     searchValue,
     setSearchValue,
+    submitSearch,
     updateQuery,
   } = useTaskFilters(initialQuery);
   const [formOpen, setFormOpen] = useState(false);
@@ -51,6 +54,11 @@ export function DashboardClient({
   const today = useLocalToday();
   const tasksQuery = useTasks(query);
   const metricsQuery = useTaskMetrics(today);
+  const suggestionQuery = useTaskSuggestions({
+    q: searchValue,
+    status: query.status,
+    priority: query.priority,
+  });
   const toggleMutation = useToggleTask();
 
   const openCreate = () => {
@@ -131,11 +139,11 @@ export function DashboardClient({
         <TaskToolbar
           query={query}
           searchValue={searchValue}
+          suggestions={suggestionQuery.suggestions}
+          suggestionState={suggestionQuery.state}
           onSearchChange={setSearchValue}
-          onSearchClear={() => {
-            setSearchValue("");
-            updateQuery({ q: undefined });
-          }}
+          onSearchSubmit={submitSearch}
+          onSearchClear={clearSearch}
           onQueryChange={(key, value) =>
             updateQuery({ [key]: value || undefined })
           }
